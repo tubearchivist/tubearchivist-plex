@@ -42,6 +42,12 @@ A list of potential default installation locations:
     * '/raid0/data/module/Plex/sys/Plex Media Server/',                          # Thecus
     * '/raid0/data/PLEX_CONFIG/Plex Media Server/'                               # Thecus Plex community
 
+## First time setup preparations
+1. Pull the [API Key](https://docs.tubearchivist.com/settings/#integrations) for TubeArchivist and have it ready for the configuration files.
+2. Setup the [`X-Plex-Token` file](https://support.plex.tv/hc/en-us/articles/204059436-Finding-your-account-token-X-Plex-Token).
+3. Ensure that Plex can see the Media directory that you will use to store the videos.
+4. Ensure that the system running Plex can communicate to TubeArchivist.
+
 ## Download `.zip` File
 1. Download the Zip File: https://github.com/tubearchivist/tubearchivist-plex/archive/refs/heads/main.zip
 2. Unpack the Zip File.

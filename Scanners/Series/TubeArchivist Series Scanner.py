@@ -234,7 +234,7 @@ def get_ta_video_metadata(ytid):
   if not TA_CONFIG:
     Log.error("No configurations in TA_CONFIG.")
     return
-  if not chid:
+  if not ytid:
     Log.error("No {} ID present.".format(mtype))
     return
   try:
