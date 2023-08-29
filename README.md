@@ -18,11 +18,16 @@ Not all metadata that Plex can show is being provided at this time and will be i
 # Installation Steps
 ## Plex Media Server Location
 The root `Plex Media Server` directory can be in different locations depending on how it is installed. All references for installation will be based on this location.
+
 Article: [How Do I Manually Install A Plugin?](https://support.plex.tv/articles/201187656-how-do-i-manually-install-a-plugin/)
+
 Article: [How Do I Find the Plug-ins Folder?](https://support.plex.tv/articles/201106098-how-do-i-find-the-plug-ins-folder/)
+
 Article: [Where Is The Plex MediaServer Data Directory Located?](https://support.plex.tv/articles/202915258-where-is-the-plex-media-server-data-directory-located/)
 
 A list of potential default installation locations:
+
+
     * '%LOCALAPPDATA%\Plex Media Server\'                                        # Windows Vista/7/8
     * '%USERPROFILE%\Local Settings\Application Data\Plex Media Server\'         # Windows XP, 2003, Home Server
     * '$HOME/Library/Application Support/Plex Media Server/'                     # Mac OS
@@ -76,6 +81,7 @@ If the Scanner and Agent are selected, but the channels or videos are not pullin
 
 # Log Locations
 Scanner Log Location: `Plex Media Server/Logs/TubeArchivist Scanner`, default file is `_root_.scanner.log`
+
 Agent Log Location: `Plex Media Server/Logs/PMS Plugin Logs/com.plexapp.agents.tubearchivist_agent.log`
 
 # Issues
