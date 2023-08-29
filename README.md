@@ -43,7 +43,7 @@ A list of potential default installation locations:
     * '/raid0/data/PLEX_CONFIG/Plex Media Server/'                               # Thecus Plex community
 
 ## Download `.zip` File
-1. Download the Zip File: https://github.com/tubearchivist/YouTube-Agent.bundle/archive/refs/heads/main.zip
+1. Download the Zip File: https://github.com/tubearchivist/tubearchivist-plex/archive/refs/heads/main.zip
 2. Unpack the Zip File.
 3. Rename the unpacked directory to `TubeArchivist-Agent.bundle`.
 
