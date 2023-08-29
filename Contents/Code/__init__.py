@@ -97,19 +97,19 @@ def read_file(localfile):
 
       
 ### Plex Library XML ###
-token_file_path = os.path.join(PLEX_ROOT, "X-Plex-Token.id")
-if os.path.isfile(token_file_path):
-  Log.Info(u"'X-Plex-Token.id' file present")
-  token_file=Data.Load(token_file_path)
-  if token_file:  PLEX_LIBRARY_URL += "?X-Plex-Token=" + token_file.strip()
-  #Log.Info(PLEX_LIBRARY_URL) ## Security risk if posting logs with token displayed
-try:
-  library_xml = etree.fromstring(urllib2.urlopen(PLEX_LIBRARY_URL).read())
-  for library in library_xml.iterchildren('Directory'):
-    for path in library.iterchildren('Location'):
-      PLEX_LIBRARY[path.get("path")] = library.get("title")
-except Exception as e:
-  Log.Info(u"Place correct Plex token in {} file to have a log per library - https://support.plex.tv/hc/en-us/articles/204059436-Finding-your-account-token-X-Plex-Token, Error: {}".format(token_file_path, str(e)))
+# token_file_path = os.path.join(PLEX_ROOT, "X-Plex-Token.id")
+# if os.path.isfile(token_file_path):
+#   Log.Info(u"'X-Plex-Token.id' file present")
+#   token_file=Data.Load(token_file_path)
+#   if token_file:  PLEX_LIBRARY_URL += "?X-Plex-Token=" + token_file.strip()
+#   #Log.Info(PLEX_LIBRARY_URL) ## Security risk if posting logs with token displayed
+# try:
+#   library_xml = etree.fromstring(urllib2.urlopen(PLEX_LIBRARY_URL).read())
+#   for library in library_xml.iterchildren('Directory'):
+#     for path in library.iterchildren('Location'):
+#       PLEX_LIBRARY[path.get("path")] = library.get("title")
+# except Exception as e:
+#   Log.Info(u"Place correct Plex token in {} file to have a log per library - https://support.plex.tv/hc/en-us/articles/204059436-Finding-your-account-token-X-Plex-Token, Error: {}".format(token_file_path, str(e)))
 
 
 def load_ta_config():
