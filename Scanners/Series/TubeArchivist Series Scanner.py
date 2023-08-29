@@ -282,7 +282,10 @@ def get_ta_channel_metadata(chid):
     if ch_response:
       metadata = {}
       metadata['show'] = "{} [{}]".format(ch_response['data']['channel_name'], ch_response['data']['channel_id'])
-      channel_refresh = datetime.datetime.strptime(ch_response['data']['channel_last_refresh'],"%d %b, %Y")
+      if TA_CONFIG['version'] < [0,3,7]:
+        channel_refresh = datetime.datetime.strptime(ch_response['data']['channel_last_refresh'],"%d %b, %Y")
+      else:
+        channel_refresh = datetime.datetime.strptime(ch_response['data']['channel_last_refresh'],"%Y-%m-%d")
       metadata['refresh_date'] = channel_refresh.strftime("%Y%m%d")
       metadata['description'] = ch_response['data']['channel_description']
       metadata['banner_url'] = ch_response['data']['channel_banner_url']
