@@ -245,8 +245,12 @@ def get_ta_video_metadata(ytid):
       metadata['show'] = "{} [{}]".format(vid_response['data']['channel']['channel_name'], vid_response['data']['channel']['channel_id'])
       metadata['ytid'] = vid_response['data']['youtube_id']
       metadata['title'] = vid_response['data']['title']
-      metadata['processed_date'] = datetime.datetime.strptime(vid_response['data']['published'],"%d %b, %Y")
-      video_refresh = datetime.datetime.strptime(vid_response['data']['vid_last_refresh'],"%d %b, %Y")
+      if TA_CONFIG['version'] < [0,3,7]:
+        metadata['processed_date'] = datetime.datetime.strptime(vid_response['data']['published'],"%d %b, %Y")
+        video_refresh = datetime.datetime.strptime(vid_response['data']['vid_last_refresh'],"%d %b, %Y")
+      else:
+        metadata['processed_date'] = datetime.datetime.strptime(vid_response['data']['published'],"%Y-%m-%d")
+        video_refresh = datetime.datetime.strptime(vid_response['data']['vid_last_refresh'],"%Y-%m-%d")
       metadata['refresh_date'] = video_refresh.strftime("%Y%m%d")
       metadata['season'] = metadata['processed_date'].year
       metadata['episode'] = metadata['processed_date'].strftime("%Y%m%d")
@@ -278,7 +282,10 @@ def get_ta_channel_metadata(chid):
     if ch_response:
       metadata = {}
       metadata['show'] = "{} [{}]".format(ch_response['data']['channel_name'], ch_response['data']['channel_id'])
-      channel_refresh = datetime.datetime.strptime(ch_response['data']['channel_last_refresh'],"%d %b, %Y")
+      if TA_CONFIG['version'] < [0,3,7]:
+        channel_refresh = datetime.datetime.strptime(ch_response['data']['channel_last_refresh'],"%d %b, %Y")
+      else:
+        channel_refresh = datetime.datetime.strptime(ch_response['data']['channel_last_refresh'],"%Y-%m-%d")
       metadata['refresh_date'] = channel_refresh.strftime("%Y%m%d")
       metadata['description'] = ch_response['data']['channel_description']
       metadata['banner_url'] = ch_response['data']['channel_banner_url']
