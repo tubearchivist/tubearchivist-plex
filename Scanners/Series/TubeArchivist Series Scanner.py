@@ -302,8 +302,9 @@ def get_ta_channel_metadata(chid):
 def Scan(path, files, mediaList, subdirs):
   setup()
   load_ta_config()
-  is_ta_on = None
-  is_ta_on, ta_version = test_ta_connection()
+  TA_CONFIG['online'] = None
+  TA_CONFIG['version'] = []
+  TA_CONFIG['online'], TA_CONFIG['version'] = test_ta_connection()
   VideoFiles.Scan(path, files, mediaList, subdirs)
 
   paths = Utils.SplitPath(path)
@@ -325,8 +326,8 @@ def Scan(path, files, mediaList, subdirs):
           video_metadata = {}
           if match:
             Log.info("File matches expected filename layout.")
-            if is_ta_on:
-              if ta_version < [0,3,7]:
+            if TA_CONFIG['online']:
+              if TA_CONFIG['version'] < [0,3,7]:
                 Log.info("Processing filename with legacy filename format.")
                 originalAirDate = file[0:7]
                 ytid = file[9:20]
