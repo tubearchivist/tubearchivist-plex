@@ -44,9 +44,8 @@ A list of potential default installation locations:
 
 ## First time setup preparations
 1. Pull the [API Key](https://docs.tubearchivist.com/settings/#integrations) for TubeArchivist and have it ready for the configuration files.
-2. Setup the [`X-Plex-Token` file](https://support.plex.tv/hc/en-us/articles/204059436-Finding-your-account-token-X-Plex-Token).
-3. Ensure that Plex can see the Media directory that you will use to store the videos.
-4. Ensure that the system running Plex can communicate to TubeArchivist.
+2. Ensure that Plex can see the Media directory that you will use to store the videos.
+3. Ensure that the system running Plex can communicate to TubeArchivist.
 
 ## Download `.zip` File
 1. Download the Zip File: https://github.com/tubearchivist/tubearchivist-plex/archive/refs/heads/main.zip
@@ -57,10 +56,10 @@ A list of potential default installation locations:
 > [!NOTE]
 > The `Scanners` and `Series` folders are not created by default. If this is your first time using a Scanner, follow the instructions as-is.
 
-1. Inside the `TubeArchivist-Agent.bundle`, move the subdirectory `Scanners` into the `Plex Media Server` root directory.
+1. Inside the `TubeArchivist-Agent.bundle`, move the subdirectory `Scanners` into the `Plex Media Server` directory.
 2. Inside the `Scanners\Series` directory, rename or copy the `sample-ta-config.json` to `ta-config.json`.
 3. Update the configurations within the `ta-config.json` file to reflect your settings for connecting to the TubeArchivist instance and its [API Key](https://docs.tubearchivist.com/settings/#integrations).
-4. Change the ownership and permissions to allow access to the Plex user that is appropriate for your system. This should match most other files already in the root directory.
+4. Change the ownership and permissions of both the Python script and configuration JSON file to allow access to the Plex user that is appropriate for your system. This should match most other files already in the `Plex Media Server` directory.
 5. After you have placed the Agent, you will restart the Plex Media Server service.
 
 ## Agent Installation
