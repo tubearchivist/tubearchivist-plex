@@ -1,3 +1,5 @@
+![](https://i.imgur.com/rCs6taI.jpg)
+
 # TubeArchivist Plex Integration
 
 This is a custom set of Scanner and Agent to integrate [TubeArchivist](https://github.com/tubearchivist/tubearchivist) with Plex.
@@ -27,18 +29,18 @@ Article: [Where Is The Plex MediaServer Data Directory Located?](https://support
 
 A list of potential default installation locations:
 
-
+    * '$PLEX_HOME/Library/Application Support/Plex Media Server/',               # Linux
+    * '/mnt/user/appdata/plex/Library/Application Support/Plex Media Server',    # Unraid
     * '%LOCALAPPDATA%\Plex Media Server\'                                        # Windows Vista/7/8
     * '%USERPROFILE%\Local Settings\Application Data\Plex Media Server\'         # Windows XP, 2003, Home Server
-    * '$HOME/Library/Application Support/Plex Media Server/'                     # Mac OS
-    * '$PLEX_HOME/Library/Application Support/Plex Media Server/',               # Linux
+    * '/volume1/Plex/Library/Application Support/Plex Media Server/',            # Synology, Asustor
     * '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/', # Debian,Fedora,CentOS,Ubuntu
     * '/usr/local/plexdata/Plex Media Server/',                                  # FreeBSD
-    * '/usr/pbi/plexmediaserver-amd64/plexdata/Plex Media Server/',              # FreeNAS
-    * '${JAIL_ROOT}/var/db/plexdata/Plex Media Server/',                         # FreeNAS
+    * '/usr/pbi/plexmediaserver-amd64/plexdata/Plex Media Server/',              # TrueNAS
+    * '${JAIL_ROOT}/var/db/plexdata/Plex Media Server/',                         # TrueNAS
     * '/c/.plex/Library/Application Support/Plex Media Server/',                 # ReadyNAS
     * '/share/MD0_DATA/.qpkg/PlexMediaServer/Library/Plex Media Server/',        # QNAP
-    * '/volume1/Plex/Library/Application Support/Plex Media Server/',            # Synology, Asustor
+    * '$HOME/Library/Application Support/Plex Media Server/'                     # Mac OS
     * '/raid0/data/module/Plex/sys/Plex Media Server/',                          # Thecus
     * '/raid0/data/PLEX_CONFIG/Plex Media Server/'                               # Thecus Plex community
 
