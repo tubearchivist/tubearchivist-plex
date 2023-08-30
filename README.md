@@ -57,8 +57,8 @@ A list of potential default installation locations:
 > The `Scanners` and `Series` folders are not created by default. If this is your first time using a Scanner, follow the instructions as-is.
 
 1. Inside the `TubeArchivist-Agent.bundle`, move the subdirectory `Scanners` into the `Plex Media Server` directory.
-2. Inside the `Scanners\Series` directory, rename or copy the `sample-ta-config.json` to `ta-config.json`.
-3. Update the configurations within the `ta-config.json` file to reflect your settings for connecting to the TubeArchivist instance and its [API Key](https://docs.tubearchivist.com/settings/#integrations).
+2. Inside the `Scanners\Series` directory, rename or copy the `sample-ta_config.json` to `ta_config.json`.
+3. Update the configurations within the `ta_config.json` file to reflect your settings for connecting to the TubeArchivist instance and its [API Key](https://docs.tubearchivist.com/settings/#integrations).
 4. Change the ownership and permissions of both the Python script and configuration JSON file to allow access to the Plex user that is appropriate for your system. This should match most other files already in the `Plex Media Server` directory.
 5. After you have placed the Agent, you will restart the Plex Media Server service.
 
