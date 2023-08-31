@@ -106,7 +106,7 @@ def read_file(localfile):
       file_content = file.read()
     return file_content
   except Exception as e:
-    Log.error("Error reading or accessing file '%s', Exception: '%s'" % (local_file, e))
+    Log.error("Error reading or accessing file '%s', Exception: '%s'" % (localfile, e))
     raise e
 
 
@@ -175,16 +175,23 @@ def get_ta_config():
   SCANNER_LOCATION = "Scanners/Series/"
   CONFIG_NAME = "ta_config.json"
   response = {}
+  config_file = os.path.join(PLEX_ROOT, SCANNER_LOCATION, CONFIG_NAME)
   try:
-    response = json.loads(read_file(os.path.join(PLEX_ROOT, SCANNER_LOCATION, CONFIG_NAME)) if os.path.isfile(os.path.join(PLEX_ROOT, SCANNER_LOCATION, CONFIG_NAME)) else "{}")
-  except ValueError as v:
-    Log.error("Check to see if `{}` has proper JSON formatting.".format(CONFIG_NAME))
-    raise v
+    response = json.loads(read_file(config_file) if os.path.isfile(config_file) else "{}")
+  except ValueError as e:
+    Log.error("Check to see if `{}` has proper JSON formatting. Exception: {}".format(config_file, e))
+    raise e
+  except IOError as e:
+    Log.error("Check to see if `{}` has correct permissions. Exception: {}".format(config_file, e))
+    raise e
   except Exception as e:
-    Log.error("Issue with loading `{}` file. Check to see if the file exists, is accessible, and is properly formatted. Exception: {}".format(CONFIG_NAME, e))
+    Log.error("Issue with loading `{}` Scanner config file. Check to see if the file exists, is accessible, and is properly formatted. Exception: {}".format(config_file, e))
     raise e
   if not response:
-    Log.error("Check to see if `{}` file exists, is accessible, and has configuration data.".format(CONFIG_NAME))
+    if os.path.isfile(config_file):
+      Log.error("Check to see if `{}` Scanner config file is accessible and has configuration data.".format(config_file))
+    else:
+      Log.error("Check to see if the Scanner config file `{}` exists.".format(config_file))
   for key in ['ta_url', 'ta_api_key']:
     if key not in response:
       Log.error("Configuration is missing key '{}'.".format(key))
