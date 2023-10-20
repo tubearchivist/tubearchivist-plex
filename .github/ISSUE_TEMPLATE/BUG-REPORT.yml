@@ -38,7 +38,7 @@ body:
     attributes:
       label: Relevant log output
       description: Please copy and paste any relevant [Plex logs](https://github.com/tubearchivist/tubearchivist-plex#log-locations). This will be automatically formatted into code, so no need for backticks.
-      render: shell
+      render: Shell
     validations:
       required: true
 
