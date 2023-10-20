@@ -187,7 +187,10 @@ def get_ta_video_metadata(ytid):
     Log.Info("Response from TubeArchivist received for YouTube {}: {}".format(mtype, ytid))
     if vid_response:
       metadata = {}
-      metadata['show'] = "{} [{}]".format(vid_response['data']['channel']['channel_name'], vid_response['data']['channel']['channel_id'])
+      if Prefs['show_channel_id']:
+        metadata['show'] = "{} [{}]".format(vid_response['data']['channel']['channel_name'], vid_response['data']['channel']['channel_id'])
+      else:
+        metadata['show'] = "{}".format(vid_response['data']['channel']['channel_name'])
       metadata['ytid'] = vid_response['data']['youtube_id']
       metadata['title'] = vid_response['data']['title']
       metadata['processed_date'] = Datetime.ParseDate(vid_response['data']['published'])
@@ -222,7 +225,10 @@ def get_ta_channel_metadata(chid):
     Log.Info("Response from TubeArchivist received for YouTube {}: {}".format(mtype, chid))
     if ch_response:
       metadata = {}
-      metadata['show'] = "{} [{}]".format(ch_response['data']['channel_name'], ch_response['data']['channel_id'])
+      if Prefs['show_channel_id']:
+        metadata['show'] = "{} [{}]".format(ch_response['data']['channel_name'], ch_response['data']['channel_id'])
+      else:
+        metadata['show'] = "{}".format(ch_response['data']['channel_name'])
       channel_refresh = Datetime.ParseDate(ch_response['data']['channel_last_refresh'])
       metadata['refresh_date'] = channel_refresh.strftime("%Y%m%d")
       metadata['description'] = ch_response['data']['channel_description']

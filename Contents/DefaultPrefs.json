@@ -3,4 +3,5 @@
     { "id":"media_poster_source",           "label":"Media Poster",                                   "type":"enum", "default":"Channel", "values": ["Channel", "Episode"] },
     { "id":"tubearchivist_api_key",         "label":"TubeArchivist API Key",                          "type":"text", "default":"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"   },
     { "id":"tubearchivist_url",             "label":"TubeArchivist URL",                              "type":"text", "default":"http://tubearchivist.local"},
+    { "id":"show_channel_id",               "label":"Append Channel ID to end of Channel Name",       "type":"bool", "default":"true"},
 ]

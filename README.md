@@ -34,6 +34,7 @@ A list of potential default installation locations:
     * '%LOCALAPPDATA%\Plex Media Server\'                                        # Windows Vista/7/8
     * '%USERPROFILE%\Local Settings\Application Data\Plex Media Server\'         # Windows XP, 2003, Home Server
     * '/volume1/Plex/Library/Application Support/Plex Media Server/',            # Synology, Asustor
+    * '/volume1/PlexMediaServer/AppData/Plex Media Server/',                     # Synology [DSM 7.X Update]
     * '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/', # Debian,Fedora,CentOS,Ubuntu
     * '/usr/local/plexdata/Plex Media Server/',                                  # FreeBSD
     * '/usr/pbi/plexmediaserver-amd64/plexdata/Plex Media Server/',              # TrueNAS

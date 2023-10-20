@@ -1,0 +1,53 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to help improve this project! Bug reports are important to ensure that all required details are coming through as expected and that we are able to ensure the highest levels of fidelity regarding TubeArchivist's and Plex's communications.
+
+  - type: checkboxes
+    id: latest
+    attributes:
+      label: "I've read the documentation."
+      options:
+        - label: I'm running the latest version of the TubeArchivist Plex Integration Scanner and Agent. I have read the latest release notes and installation instructions.
+          required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      description: On what operating system are you running Plex on?
+      placeholder: ex. Linux, Unraid, Synology...
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Your Bug Report
+      value: "## Describe the bug\n\n## Steps To Reproduce\n\n## Expected behavior"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant [Plex logs](https://github.com/tubearchivist/tubearchivist-plex#log-locations). This will be automatically formatted into code, so no need for backticks.
+      render: Shell
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Anything else?
+      description: |
+        Links? References? Anything that will give us more context about the issue you are encountering!
+
+        Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
+    validations:
+      required: false
