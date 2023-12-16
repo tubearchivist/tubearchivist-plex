@@ -291,22 +291,22 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
       else:
         Log.Error("Cannot find subtitle locally. Video's path of '{}' does not exist or is inaccessible.".format(filepath))
     
-    for language, subs in languages.items():
-      for item in media_obj.items:
-        for part in item.parts:
-          part.subtitles[language][filename] = subs
-    
-    for new_language, subtitles in lang_sub_map.items():
-      if new_language not in lang_pub_map:
-        lang_pub_map[new_language] = []
-      lang_pub_map[new_language].append(subtitles)
-      for item in media_obj.items:
-        for part in item.parts:
-          for language in lang_pub_map.keys():
-            part.subtitles[language].validate_keys(lang_pub_map[language])
-          for language in list(set(part.subtitles.keys()) - set(lang_pub_map.keys())):
-            Log.Info("Removing language code '{}' that is no longer available as a locally downloaded subtitle for video ID {}.".format(language, vid_metadata['ytid']))
-            part.subtitles[language].validate_keys({})
+  for language, subs in languages.items():
+    for item in media_obj.items:
+      for part in item.parts:
+        part.subtitles[language][filename] = subs
+  
+  for new_language, subtitles in lang_sub_map.items():
+    if new_language not in lang_pub_map:
+      lang_pub_map[new_language] = []
+    lang_pub_map[new_language].append(subtitles)
+    for item in media_obj.items:
+      for part in item.parts:
+        for language in lang_pub_map.keys():
+          part.subtitles[language].validate_keys(lang_pub_map[language])
+        for language in list(set(part.subtitles.keys()) - set(lang_pub_map.keys())):
+          Log.Info("Removing language code '{}' that is no longer available as a locally downloaded subtitle for video ID {}.".format(language, vid_metadata['ytid']))
+          part.subtitles[language].validate_keys({})
 
 
 def GetLibraryRootPath(dir):
