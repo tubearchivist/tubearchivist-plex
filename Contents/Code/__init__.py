@@ -22,6 +22,9 @@ try:
 except:
   from urllib import quote
 
+import inspect
+from pprint import pprint
+
 TA_CONFIG              = {}
 PLUGIN_PATH            = os.path.abspath(os.path.join(os.path.dirname(inspect.getfile(inspect.currentframe())), "..", ".."))
 
@@ -307,7 +310,7 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
     for part in item.parts:
       for language in lang_pub_map.keys():
         Log.Debug("Validating keys for {}.".format(lang_pub_map[language]))
-        Log.Debug("Output part details: {}".format(part.subtitles))
+        Log.Debug("Output part details: {}".format(pprint(inspect.get_members(part.subtitles))))
         part.subtitles[language].validate_keys(lang_pub_map[language])
       for language in list(set(part.subtitles.keys()) - set(lang_pub_map.keys())):
         Log.Info("Removing language code '{}' that is no longer available as a locally downloaded subtitle for video ID {}.".format(language, vid_metadata['ytid']))
