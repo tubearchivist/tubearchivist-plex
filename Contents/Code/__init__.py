@@ -327,7 +327,7 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
 
   for item in media_obj.items:
     for part in item.parts:
-      for language in part.subtitles.keys()
+      for language in part.subtitles.keys():
         Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\nLANG({}): {}".format(DebugObject(part),DebugObject(part.subtitles), language, DebugObject(part.subtitles[language])))
 
 
