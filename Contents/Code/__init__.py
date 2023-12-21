@@ -267,12 +267,12 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
 
         if os.path.exists(plex_sub_path):
           if not languages.has_key(lang_match):
-            languages[lang_match]   = []
+            languages[lang_match]     = []
           if "Default" in sub['name']:
-            default                 = '1'
+            default                   = '1'
           if "Forced" in sub['name'] or "user" in sub['source']:
-            forced                  = '1'
-          additional_classifications = []
+            forced                    = '1'
+          additional_classifications  = []
           if default:
             additional_classifications.append("Default")
           if forced:
@@ -281,32 +281,34 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
             additional_classifications.append("None")
           Log.Info("Locally downloaded subtitle identified for video ID {} with language code '{}'. Additional classifications: {}".format(vid_metadata['ytid'], lang_match, ", ".join(additional_classifications)))
           languages[lang_match].append(Proxy.LocalFile(plex_sub_path, index=str(language_index), codec=codec, format=format, default=default, forced=forced))
-          language_index           += 1
+          language_index              += 1
 
           if lang_match not in lang_sub_map:
             lang_sub_map[lang_match] = []
           lang_sub_map[lang_match].append(filename)
+
+          for language, subs in languages.items():
+            for item in media_obj.items:
+              for part in item.parts:
+                part.subtitles[language][filename] = subs
+
         else:
           Log.Error("Cannot find subtitle locally. Subtitle does not exist with video's path replacement '{}'.".format(plex_sub_path))
       else:
         Log.Error("Cannot find subtitle locally. Video's path of '{}' does not exist or is inaccessible.".format(filepath))
-    
-  for language, subs in languages.items():
-    for item in media_obj.items:
-      for part in item.parts:
-        part.subtitles[language][filename] = subs
+
   
   for new_language, subtitles in lang_sub_map.items():
     if new_language not in lang_pub_map:
       lang_pub_map[new_language] = []
     lang_pub_map[new_language].append(subtitles)
-    for item in media_obj.items:
-      for part in item.parts:
-        for language in lang_pub_map.keys():
-          part.subtitles[language].validate_keys(lang_pub_map[language])
-        for language in list(set(part.subtitles.keys()) - set(lang_pub_map.keys())):
-          Log.Info("Removing language code '{}' that is no longer available as a locally downloaded subtitle for video ID {}.".format(language, vid_metadata['ytid']))
-          part.subtitles[language].validate_keys({})
+  for item in media_obj.items:
+    for part in item.parts:
+      for language in lang_pub_map.keys():
+        part.subtitles[language].validate_keys(lang_pub_map[language])
+      for language in list(set(part.subtitles.keys()) - set(lang_pub_map.keys())):
+        Log.Info("Removing language code '{}' that is no longer available as a locally downloaded subtitle for video ID {}.".format(language, vid_metadata['ytid']))
+        part.subtitles[language].validate_keys({})
 
 
 def GetLibraryRootPath(dir):
