@@ -325,6 +325,11 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
         Log.Info("Removing language code '{}' that is no longer available as a locally downloaded subtitle for video ID {}.".format(language, vid_metadata['ytid']))
         part.subtitles[language].validate_keys({})
 
+  for item in media_obj.items:
+    for part in item.parts:
+      for language in part.subtitles.keys()
+        Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\nLANG({}): {}".format(DebugObject(part),DebugObject(part.subtitles), language, DebugObject(part.subtitles[language])))
+
 
 def GetLibraryRootPath(dir):
   library, root, path = '', '', ''
