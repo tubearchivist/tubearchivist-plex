@@ -58,6 +58,15 @@ def sanitize_path        (p):  return p if isinstance(p, unicode) else p.decode(
 #####################
 
 
+def DebugObject (obj):
+  output = ""
+  output = "{}\n\t{}".format(output, str(obj))
+  for attr in inspect.getmembers(obj):
+    if not attr[0].startswith("__"):
+      output = "{}\n\t{}".format(output, str(attr))
+  return output
+
+
 def Dict(var, *arg, **kwarg):  #Avoid TypeError: argument of type 'NoneType' is not iterable
   for key in arg:
     if isinstance(var, dict) and key and key in var or isinstance(var, list) and isinstance(key, int) and 0<=key<len(var):
@@ -310,7 +319,7 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
     for part in item.parts:
       for language in lang_pub_map.keys():
         Log.Debug("Validating keys for {}.".format(lang_pub_map[language]))
-        Log.Debug("Output part details: {}".format(inspect.getmembers(part.subtitles)))
+        Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\nLANG({}): {}".format(DebugObject(part),DebugObject(part.subtitles), language, DebugObject(part.subtitles[language])))
         part.subtitles[language].validate_keys(lang_pub_map[language])
       for language in list(set(part.subtitles.keys()) - set(lang_pub_map.keys())):
         Log.Info("Removing language code '{}' that is no longer available as a locally downloaded subtitle for video ID {}.".format(language, vid_metadata['ytid']))
