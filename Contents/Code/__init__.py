@@ -302,9 +302,11 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
     if new_language not in lang_pub_map:
       lang_pub_map[new_language] = []
     lang_pub_map[new_language].append(subtitles)
+
   for item in media_obj.items:
     for part in item.parts:
       for language in lang_pub_map.keys():
+        Log.Debug("Validating keys for {}.".format(lang_pub_map[language]))
         part.subtitles[language].validate_keys(lang_pub_map[language])
       for language in list(set(part.subtitles.keys()) - set(lang_pub_map.keys())):
         Log.Info("Removing language code '{}' that is no longer available as a locally downloaded subtitle for video ID {}.".format(language, vid_metadata['ytid']))
