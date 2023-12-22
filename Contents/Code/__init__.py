@@ -319,22 +319,22 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
 
   for item in media_obj.items:
     for part in item.parts:
-      # Log.Debug("Validating keys for {}.".format(lang_pub_map))
-      # Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\n".format(DebugObject(part),DebugObject(part.subtitles)))
-      # for language in part.subtitles.keys():
-      #   Log.Debug("\nLANG({}): {}".format(language, DebugObject(part.subtitles[language])))
+      Log.Debug("Validating keys for {}.".format(lang_pub_map))
+      Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\n".format(DebugObject(part),DebugObject(part.subtitles)))
+      for language in part.subtitles.keys():
+        Log.Debug("\nLANG({}): {}".format(language, DebugObject(part.subtitles[language])))
       for language in lang_sub_map.keys():
         part.subtitles[language].validate_keys(lang_pub_map)
       for language in list(set(part.subtitles.keys()) - set(lang_sub_map.keys())):
         Log.Info("Removing language code '{}' that is no longer available as a locally downloaded subtitle for video ID {}.".format(language, vid_metadata['ytid']))
         part.subtitles[language].validate_keys({})
 
-  # for item in media_obj.items:
-  #   for part in item.parts:
-  #     for language in part.subtitles.keys():
-  #       Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\n".format(DebugObject(part),DebugObject(part.subtitles)))
-  #       for language in part.subtitles.keys():
-  #         Log.Debug("\nLANG({}): {}".format(language, DebugObject(part.subtitles[language])))
+  for item in media_obj.items:
+    for part in item.parts:
+      for language in part.subtitles.keys():
+        Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\n".format(DebugObject(part),DebugObject(part.subtitles)))
+        for language in part.subtitles.keys():
+          Log.Debug("\nLANG({}): {}".format(language, DebugObject(part.subtitles[language])))
 
 def GetLibraryRootPath(dir):
   library, root, path = '', '', ''
