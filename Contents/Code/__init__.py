@@ -32,7 +32,7 @@ CachePath              = os.path.join(PLEX_ROOT, "Plug-in Support", "Data", "com
 PLEX_LIBRARY           = {}
 PLEX_LIBRARY_URL       = "http://localhost:32400/library/sections/"  # Allow to get the library name to get a log per library https://support.plex.tv/hc/en-us/articles/204059436-Finding-your-account-token-X-Plex-Token
 SOURCE                 = "TubeArchivist Agent"
-CON_AGENTS             = []
+CON_AGENTS             = ['com.plexapp.agents.none']
 REF_AGENTS             = ['com.plexapp.agents.localmedia']
 LANGUAGES              = [Locale.Language.NoLanguage, Locale.Language.English]
 
