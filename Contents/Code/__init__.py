@@ -317,7 +317,8 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
   for lang in languages.keys():
     for item in media_obj.items:
       for part in item.parts:
-        part.subtitles[lang][lang_sub_map[lang]] = languages[lang]
+        for filename in lang_sub_map[lang]:
+          part.subtitles[lang][filename] = languages[lang]
 
 
   for item in media_obj.items:
