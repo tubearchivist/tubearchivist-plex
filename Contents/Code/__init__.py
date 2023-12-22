@@ -32,7 +32,7 @@ CachePath              = os.path.join(PLEX_ROOT, "Plug-in Support", "Data", "com
 PLEX_LIBRARY           = {}
 PLEX_LIBRARY_URL       = "http://localhost:32400/library/sections/"  # Allow to get the library name to get a log per library https://support.plex.tv/hc/en-us/articles/204059436-Finding-your-account-token-X-Plex-Token
 SOURCE                 = "TubeArchivist Agent"
-CON_AGENTS             = ['com.plexapp.agents.none']
+CON_AGENTS             = []
 REF_AGENTS             = ['com.plexapp.agents.localmedia']
 LANGUAGES              = [Locale.Language.NoLanguage, Locale.Language.English]
 
@@ -484,7 +484,7 @@ def Update(metadata, media, lang, force):
 
 class TubeArchivistYTSeriesAgent(Agent.TV_Shows):
     name, primary_provider, fallback_agent, contributes_to, accepts_from, languages = (
-      SOURCE, True, None, CON_AGENTS, REF_AGENTS, LANGUAGES)
+      SOURCE, True, False, CON_AGENTS, REF_AGENTS, LANGUAGES)
 
     def search(self, results,  media, lang, manual):
         load_ta_config()
