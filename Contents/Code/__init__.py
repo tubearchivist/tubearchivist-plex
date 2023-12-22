@@ -293,7 +293,7 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
           Log.Info("Locally downloaded subtitle identified for video ID {} with language code '{}'. Additional classifications: {}".format(vid_metadata['ytid'], lang_match, ", ".join(additional_classifications)))
           for item in media_obj.items:
             for part in item.parts:
-              part.subtitles[lang_match][filename] = Proxy.LocalFile(plex_sub_path, index=str(language_index), codec=codec, format=format, default=default, forced=forced)
+              part.subtitles[lang_match][filename] = Proxy.LocalFile(plex_sub_path, codec=codec, format=format, default=default, forced=forced)
           # languages[lang_match].append(Proxy.LocalFile(plex_sub_path, index=str(language_index), codec=codec, format=format, default=default, forced=forced))
           language_index              += 1
 
