@@ -22,8 +22,7 @@ try:
 except:
   from urllib import quote
 
-import inspect
-from pprint import pprint
+# import inspect
 
 TA_CONFIG              = {}
 PLUGIN_PATH            = os.path.abspath(os.path.join(os.path.dirname(inspect.getfile(inspect.currentframe())), "..", ".."))
@@ -58,13 +57,13 @@ def sanitize_path        (p):  return p if isinstance(p, unicode) else p.decode(
 #####################
 
 
-def DebugObject (obj):
-  output = ""
-  output = "{}\n\t{}".format(output, str(obj))
-  for attr in inspect.getmembers(obj):
-    if not attr[0].startswith("__"):
-      output = "{}\n\t{}".format(output, str(attr))
-  return output
+# def DebugObject (obj):
+#   output = ""
+#   output = "{}\n\t{}".format(output, str(obj))
+#   for attr in inspect.getmembers(obj):
+#     if not attr[0].startswith("__"):
+#       output = "{}\n\t{}".format(output, str(attr))
+#   return output
 
 
 def Dict(var, *arg, **kwarg):  #Avoid TypeError: argument of type 'NoneType' is not iterable
@@ -318,21 +317,21 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
 
   for item in media_obj.items:
     for part in item.parts:
-      Log.Debug("Validating keys for {}.".format(lang_pub_map))
-      Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\n".format(DebugObject(part),DebugObject(part.subtitles)))
-      for language in part.subtitles.keys():
-        Log.Debug("\nLANG({}): {}".format(language, DebugObject(part.subtitles[language])))
+      # Log.Debug("Validating keys for {}.".format(lang_pub_map))
+      # Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\n".format(DebugObject(part),DebugObject(part.subtitles)))
+      # for language in part.subtitles.keys():
+      #   Log.Debug("\nLANG({}): {}".format(language, DebugObject(part.subtitles[language])))
       part.subtitles[language].validate_keys(lang_pub_map)
       for language in list(set(part.subtitles.keys()) - set(lang_sub_map.keys())):
         Log.Info("Removing language code '{}' that is no longer available as a locally downloaded subtitle for video ID {}.".format(language, vid_metadata['ytid']))
         part.subtitles[language].validate_keys({})
 
-  for item in media_obj.items:
-    for part in item.parts:
-      for language in part.subtitles.keys():
-        Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\n".format(DebugObject(part),DebugObject(part.subtitles)))
-        for language in part.subtitles.keys():
-          Log.Debug("\nLANG({}): {}".format(language, DebugObject(part.subtitles[language])))
+  # for item in media_obj.items:
+  #   for part in item.parts:
+  #     for language in part.subtitles.keys():
+  #       Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\n".format(DebugObject(part),DebugObject(part.subtitles)))
+  #       for language in part.subtitles.keys():
+  #         Log.Debug("\nLANG({}): {}".format(language, DebugObject(part.subtitles[language])))
 
 def GetLibraryRootPath(dir):
   library, root, path = '', '', ''
