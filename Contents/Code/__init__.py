@@ -291,10 +291,10 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
           if not additional_classifications:
             additional_classifications.append("None")
           Log.Info("Locally downloaded subtitle identified for video ID {} with language code '{}'. Additional classifications: {}".format(vid_metadata['ytid'], lang_match, ", ".join(additional_classifications)))
+
           for item in media_obj.items:
             for part in item.parts:
               part.subtitles[lang_match][filename] = Proxy.LocalFile(plex_sub_path, codec=codec, format=format, default=default, forced=forced)
-          # languages[lang_match].append(Proxy.LocalFile(plex_sub_path, index=str(language_index), codec=codec, format=format, default=default, forced=forced))
           language_index              += 1
 
           if lang_match not in lang_sub_map:
@@ -305,7 +305,6 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
           Log.Error("Cannot find subtitle locally. Subtitle does not exist with video's path replacement '{}'.".format(plex_sub_path))
       else:
         Log.Error("Cannot find subtitle locally. Video's path of '{}' does not exist or is inaccessible.".format(filepath))
-
   
   for lang, subtitle in lang_sub_map.items():
     if subtitle not in lang_pub_map:
