@@ -319,7 +319,7 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
       Log.Debug("Validating keys for {}.".format(lang_pub_map))
       Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\nLANG({}): {}".format(DebugObject(part),DebugObject(part.subtitles), language, DebugObject(part.subtitles[language])))
       part.subtitles[language].validate_keys(lang_pub_map)
-      for language in list(set(part.subtitles.keys()) - set(lang_pub_map)):
+      for language in list(set(part.subtitles.keys()) - set(tuple(lang_pub_map))):
         Log.Info("Removing language code '{}' that is no longer available as a locally downloaded subtitle for video ID {}.".format(language, vid_metadata['ytid']))
         part.subtitles[language].validate_keys({})
 
