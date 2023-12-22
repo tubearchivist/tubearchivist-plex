@@ -312,7 +312,7 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
   
   for subtitle in lang_sub_map.items():
     if subtitle not in lang_pub_map:
-      lang_pub_map.append(subtitle)
+      lang_pub_map.append(subtitle[1])
 
   for item in media_obj.items:
     for part in item.parts:
