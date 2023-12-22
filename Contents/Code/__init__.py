@@ -299,11 +299,6 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
             lang_sub_map[lang_match] = []
           lang_sub_map[lang_match].append(filename)
 
-          # for language, subs in languages.items():
-          #   for item in media_obj.items:
-          #     for part in item.parts:
-          #       part.subtitles[language][filename] = subs
-
         else:
           Log.Error("Cannot find subtitle locally. Subtitle does not exist with video's path replacement '{}'.".format(plex_sub_path))
       else:
@@ -328,7 +323,7 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
       for language in part.subtitles.keys():
         Log.Debug("\nLANG({}): {}".format(language, DebugObject(part.subtitles[language])))
       part.subtitles[language].validate_keys(lang_pub_map)
-      for language in list(set(part.subtitles.keys()) - set(tuple(lang_pub_map))):
+      for language in list(set(part.subtitles.keys()) - set(lang_sub_map.keys())):
         Log.Info("Removing language code '{}' that is no longer available as a locally downloaded subtitle for video ID {}.".format(language, vid_metadata['ytid']))
         part.subtitles[language].validate_keys({})
 
