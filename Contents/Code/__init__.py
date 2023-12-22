@@ -299,10 +299,10 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
             lang_sub_map[lang_match] = []
           lang_sub_map[lang_match].append(filename)
 
-          for language, subs in languages.items():
-            for item in media_obj.items:
-              for part in item.parts:
-                part.subtitles[language][filename] = subs
+          # for language, subs in languages.items():
+          #   for item in media_obj.items:
+          #     for part in item.parts:
+          #       part.subtitles[language][filename] = subs
 
         else:
           Log.Error("Cannot find subtitle locally. Subtitle does not exist with video's path replacement '{}'.".format(plex_sub_path))
@@ -310,9 +310,15 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
         Log.Error("Cannot find subtitle locally. Video's path of '{}' does not exist or is inaccessible.".format(filepath))
 
   
-  for _, subtitle in lang_sub_map.items():
+  for lang, subtitle in lang_sub_map.items():
     if subtitle not in lang_pub_map:
       lang_pub_map.append(subtitle[0])
+
+  for lang in languages.keys():
+    for item in media_obj.items:
+      for part in item.parts:
+        part.subtitles[lang][lang_sub_map[lang]] = languages[lang]
+
 
   for item in media_obj.items:
     for part in item.parts:
