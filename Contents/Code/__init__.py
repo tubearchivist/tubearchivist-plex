@@ -310,9 +310,9 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
         Log.Error("Cannot find subtitle locally. Video's path of '{}' does not exist or is inaccessible.".format(filepath))
 
   
-  for subtitles in lang_sub_map.items():
-    if new_language not in lang_pub_map:
-      lang_pub_map.append(subtitles)
+  for subtitle in lang_sub_map.items():
+    if subtitle not in lang_pub_map:
+      lang_pub_map.append(subtitle)
 
   for item in media_obj.items:
     for part in item.parts:
