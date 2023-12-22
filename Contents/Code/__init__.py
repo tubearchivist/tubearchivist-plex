@@ -22,6 +22,8 @@ try:
 except:
   from urllib import quote
 
+# import inspect
+
 TA_CONFIG              = {}
 PLUGIN_PATH            = os.path.abspath(os.path.join(os.path.dirname(inspect.getfile(inspect.currentframe())), "..", ".."))
 
@@ -53,6 +55,15 @@ YOUTUBE_CATEGORY_ID      = {  '1': 'Film & Animation',  '2': 'Autos & Vehicles',
 def natural_sort_key     (s):  return [int(text) if text.isdigit() else text for text in re.split(re.compile('([0-9]+)'), str(s).lower())]  ### Avoid 1, 10, 2, 20... #Usage: list.sort(key=natural_sort_key), sorted(list, key=natural_sort_key)
 def sanitize_path        (p):  return p if isinstance(p, unicode) else p.decode(sys.getfilesystemencoding()) ### Make sure the path is unicode, if it is not, decode using OS filesystem's encoding ###
 #####################
+
+
+# def DebugObject (obj):
+#   output = ""
+#   output = "{}\n\t{}".format(output, str(obj))
+#   for attr in inspect.getmembers(obj):
+#     if not attr[0].startswith("__"):
+#       output = "{}\n\t{}".format(output, str(attr))
+#   return output
 
 
 def Dict(var, *arg, **kwarg):  #Avoid TypeError: argument of type 'NoneType' is not iterable
@@ -245,7 +256,7 @@ def get_ta_channel_metadata(chid):
 
 def PullTASubtitles(vid_metadata, filepath, media_obj):
   lang_sub_map      = {}
-  lang_pub_map      = {}
+  lang_pub_map      = []
   languages         = {}
   language_index    = 0
 
@@ -280,36 +291,49 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
           if not additional_classifications:
             additional_classifications.append("None")
           Log.Info("Locally downloaded subtitle identified for video ID {} with language code '{}'. Additional classifications: {}".format(vid_metadata['ytid'], lang_match, ", ".join(additional_classifications)))
-          languages[lang_match].append(Proxy.LocalFile(plex_sub_path, index=str(language_index), codec=codec, format=format, default=default, forced=forced))
+
+          for item in media_obj.items:
+            for part in item.parts:
+              part.subtitles[lang_match][filename] = Proxy.LocalFile(plex_sub_path, codec=codec, format=format, default=default, forced=forced)
           language_index              += 1
 
           if lang_match not in lang_sub_map:
             lang_sub_map[lang_match] = []
           lang_sub_map[lang_match].append(filename)
 
-          for language, subs in languages.items():
-            for item in media_obj.items:
-              for part in item.parts:
-                part.subtitles[language][filename] = subs
-
         else:
           Log.Error("Cannot find subtitle locally. Subtitle does not exist with video's path replacement '{}'.".format(plex_sub_path))
       else:
         Log.Error("Cannot find subtitle locally. Video's path of '{}' does not exist or is inaccessible.".format(filepath))
-
   
-  for new_language, subtitles in lang_sub_map.items():
-    if new_language not in lang_pub_map:
-      lang_pub_map[new_language] = []
-    lang_pub_map[new_language].append(subtitles)
+  for lang, subtitle in lang_sub_map.items():
+    if subtitle not in lang_pub_map:
+      lang_pub_map.append(subtitle[0])
+
+  # for lang in languages.keys():
+  #   for item in media_obj.items:
+  #     for part in item.parts:
+  #       for filename in lang_sub_map[lang]:
+  #         part.subtitles[lang][filename] = languages[lang]
+
   for item in media_obj.items:
     for part in item.parts:
-      for language in lang_pub_map.keys():
-        part.subtitles[language].validate_keys(lang_pub_map[language])
-      for language in list(set(part.subtitles.keys()) - set(lang_pub_map.keys())):
+      # Log.Debug("Validating keys for {}.".format(lang_pub_map))
+      # Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\n".format(DebugObject(part),DebugObject(part.subtitles)))
+      # for language in part.subtitles.keys():
+      #   Log.Debug("\nLANG({}): {}".format(language, DebugObject(part.subtitles[language])))
+      for language in lang_sub_map.keys():
+        part.subtitles[language].validate_keys(lang_pub_map)
+      for language in list(set(part.subtitles.keys()) - set(lang_sub_map.keys())):
         Log.Info("Removing language code '{}' that is no longer available as a locally downloaded subtitle for video ID {}.".format(language, vid_metadata['ytid']))
         part.subtitles[language].validate_keys({})
 
+  # for item in media_obj.items:
+  #   for part in item.parts:
+  #     for language in part.subtitles.keys():
+  #       Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\n".format(DebugObject(part),DebugObject(part.subtitles)))
+  #       for language in part.subtitles.keys():
+  #         Log.Debug("\nLANG({}): {}".format(language, DebugObject(part.subtitles[language])))
 
 def GetLibraryRootPath(dir):
   library, root, path = '', '', ''
@@ -459,7 +483,7 @@ def Update(metadata, media, lang, force):
 
 class TubeArchivistYTSeriesAgent(Agent.TV_Shows):
     name, primary_provider, fallback_agent, contributes_to, accepts_from, languages = (
-      SOURCE, True, None, CON_AGENTS, REF_AGENTS, LANGUAGES)
+      SOURCE, True, False, CON_AGENTS, REF_AGENTS, LANGUAGES)
 
     def search(self, results,  media, lang, manual):
         load_ta_config()
