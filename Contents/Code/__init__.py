@@ -316,7 +316,7 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
 
   for item in media_obj.items:
     for part in item.parts:
-      Log.Debug("Validating keys for {}.".format(lang_pub_map[language]))
+      Log.Debug("Validating keys for {}.".format(lang_pub_map))
       Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\nLANG({}): {}".format(DebugObject(part),DebugObject(part.subtitles), language, DebugObject(part.subtitles[language])))
       part.subtitles[language].validate_keys(lang_pub_map)
       for language in list(set(part.subtitles.keys()) - set(lang_pub_map)):
