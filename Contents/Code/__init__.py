@@ -22,7 +22,7 @@ try:
 except:
   from urllib import quote
 
-# import inspect
+import inspect
 
 TA_CONFIG              = {}
 PLUGIN_PATH            = os.path.abspath(os.path.join(os.path.dirname(inspect.getfile(inspect.currentframe())), "..", ".."))
@@ -57,13 +57,13 @@ def sanitize_path        (p):  return p if isinstance(p, unicode) else p.decode(
 #####################
 
 
-# def DebugObject (obj):
-#   output = ""
-#   output = "{}\n\t{}".format(output, str(obj))
-#   for attr in inspect.getmembers(obj):
-#     if not attr[0].startswith("__"):
-#       output = "{}\n\t{}".format(output, str(attr))
-#   return output
+def DebugObject (obj):
+  output = ""
+  output = "{}\n\t{}".format(output, str(obj))
+  for attr in inspect.getmembers(obj):
+    if not attr[0].startswith("__"):
+      output = "{}\n\t{}".format(output, str(attr))
+  return output
 
 
 def Dict(var, *arg, **kwarg):  #Avoid TypeError: argument of type 'NoneType' is not iterable
