@@ -257,7 +257,7 @@ def get_ta_channel_metadata(chid):
 
 def PullTASubtitles(vid_metadata, filepath, media_obj):
   lang_sub_map      = {}
-  lang_pub_map      = {}
+  lang_pub_map      = []
   languages         = {}
   language_index    = 0
 
@@ -310,20 +310,16 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
         Log.Error("Cannot find subtitle locally. Video's path of '{}' does not exist or is inaccessible.".format(filepath))
 
   
-  for new_language, subtitles in lang_sub_map.items():
+  for subtitles in lang_sub_map.items():
     if new_language not in lang_pub_map:
-      lang_pub_map[new_language] = []
-    lang_pub_map[new_language].append(subtitles)
+      lang_pub_map.append(subtitles)
 
   for item in media_obj.items:
     for part in item.parts:
-      for language in lang_pub_map.keys():
-        Log.Debug("Validating keys for {}.".format(lang_pub_map[language]))
-        Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\nLANG({}): {}".format(DebugObject(part),DebugObject(part.subtitles), language, DebugObject(part.subtitles[language])))
-        
-        # Log.Debug("Expected comparison for validate_keys: {} | {}".format(part.subtitles[language]._proxies.keys(), lang_pub_map[language].keys()))
-        part.subtitles[language].validate_keys(lang_pub_map[language])
-      for language in list(set(part.subtitles.keys()) - set(lang_pub_map.keys())):
+      Log.Debug("Validating keys for {}.".format(lang_pub_map[language]))
+      Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\nLANG({}): {}".format(DebugObject(part),DebugObject(part.subtitles), language, DebugObject(part.subtitles[language])))
+      part.subtitles[language].validate_keys(lang_pub_map)
+      for language in list(set(part.subtitles.keys()) - set(lang_pub_map)):
         Log.Info("Removing language code '{}' that is no longer available as a locally downloaded subtitle for video ID {}.".format(language, vid_metadata['ytid']))
         part.subtitles[language].validate_keys({})
 
