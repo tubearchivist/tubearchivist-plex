@@ -291,7 +291,10 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
           if not additional_classifications:
             additional_classifications.append("None")
           Log.Info("Locally downloaded subtitle identified for video ID {} with language code '{}'. Additional classifications: {}".format(vid_metadata['ytid'], lang_match, ", ".join(additional_classifications)))
-          languages[lang_match].append(Proxy.LocalFile(plex_sub_path, index=str(language_index), codec=codec, format=format, default=default, forced=forced))
+          for item in media_obj.items:
+            for part in item.parts:
+              part.subtitles[lang_match][filename] = Proxy.LocalFile(plex_sub_path, index=str(language_index), codec=codec, format=format, default=default, forced=forced)
+          # languages[lang_match].append(Proxy.LocalFile(plex_sub_path, index=str(language_index), codec=codec, format=format, default=default, forced=forced))
           language_index              += 1
 
           if lang_match not in lang_sub_map:
@@ -308,12 +311,11 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
     if subtitle not in lang_pub_map:
       lang_pub_map.append(subtitle[0])
 
-  for lang in languages.keys():
-    for item in media_obj.items:
-      for part in item.parts:
-        for filename in lang_sub_map[lang]:
-          part.subtitles[lang][filename] = languages[lang]
-
+  # for lang in languages.keys():
+  #   for item in media_obj.items:
+  #     for part in item.parts:
+  #       for filename in lang_sub_map[lang]:
+  #         part.subtitles[lang][filename] = languages[lang]
 
   for item in media_obj.items:
     for part in item.parts:
