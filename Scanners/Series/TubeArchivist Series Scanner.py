@@ -197,7 +197,7 @@ def get_ta_config():
       Log.error("Configuration is missing key '{}'.".format(key))
   if not response['ta_url'].startswith("http") and response['ta_url'].find("://") == -1:
     response['ta_url'] = "http://" + response['ta_url']
-  Log.Debug("TA URL: %s" % (response['ta_url']))
+  Log.debug("TA URL: %s" % (response['ta_url']))
   return response
 
 
@@ -224,7 +224,7 @@ def test_ta_connection():
         Log.info("TubeArchivist did not respond with a version. Assuming v{} for interpretation.".format('.'.join(str(x) for x in ta_version)))
     except:
       Log.error("Unable to set the `ta_version`. Check the connection via `ta_ping`.")
-      Log.Debug("Response: %s" % (response))
+      Log.debug("Response: %s" % (response))
     if ta_ping == 'pong':
       return True, ta_version
   except Exception as e:
