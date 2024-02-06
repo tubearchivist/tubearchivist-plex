@@ -134,6 +134,7 @@ def load_ta_config():
       TA_CONFIG['ta_url'] = Prefs['tubearchivist_url']
       if not TA_CONFIG['ta_url'].startswith("http") and TA_CONFIG['ta_url'].find("://") == -1:
         TA_CONFIG['ta_url'] = "http://" + TA_CONFIG['ta_url']
+    Log.Debug("TA URL: %s" % (TA_CONFIG['ta_url']))
     if Prefs['tubearchivist_api_key']:
       TA_CONFIG['ta_api_key'] = Prefs['tubearchivist_api_key']
     TA_CONFIG.update(get_ta_config())
