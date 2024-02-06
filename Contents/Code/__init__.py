@@ -132,6 +132,9 @@ def load_ta_config():
     Log.Info("Loading TubeArchivist configurations from Plex Agent configuration.")
     if Prefs['tubearchivist_url']:
       TA_CONFIG['ta_url'] = Prefs['tubearchivist_url']
+      if not TA_CONFIG['ta_url'].startswith("http") and TA_CONFIG['ta_url'].find("://") == -1:
+        TA_CONFIG['ta_url'] = "http://" + TA_CONFIG['ta_url']
+    Log.Debug("TA URL: %s" % (TA_CONFIG['ta_url']))
     if Prefs['tubearchivist_api_key']:
       TA_CONFIG['ta_api_key'] = Prefs['tubearchivist_api_key']
     TA_CONFIG.update(get_ta_config())
@@ -157,13 +160,20 @@ def test_ta_connection():
     ta_version = []
     try:
       if "version" in response:
-        ta_version = response['version']
+        try:
+          if "v" in response['version'][0]:
+            ta_version = [int(x) for x in response['version'][1:].split(".")]
+          else:
+            ta_version = [int(x) for x in response['version'].split(".")]
+        except AttributeError:
+          ta_version = response['version']
         Log.Info("TubeArchivist is running version v{}".format('.'.join(str(x) for x in ta_version)))
       else:
         ta_version = [0,3,6]
         Log.Info("TubeArchivist did not respond with a version. Assuming v{} for interpretation.".format('.'.join(str(x) for x in ta_version)))
     except:
       Log.Error("Unable to set the `ta_version`. Check the connection via `ta_ping`.")
+      Log.Debug("Response: %s" % (response))
     if ta_ping == 'pong':
       return True, ta_version
   except Exception as e:
