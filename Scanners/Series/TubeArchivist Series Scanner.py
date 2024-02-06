@@ -345,6 +345,9 @@ def Scan(path, files, mediaList, subdirs):
           if match:
             Log.info("File matches expected filename layout.")
             if TA_CONFIG['online']:
+              if TA_CONFIG['version'] == []:
+                Log.error("TubeArchivist instance version is unknown or unset. Please review the logs further and ensure that there is connectivity between Plex and TubeArchivist.")
+                break
               if TA_CONFIG['version'] < [0,3,7]:
                 Log.info("Processing filename with legacy filename format.")
                 originalAirDate = file[0:7]
