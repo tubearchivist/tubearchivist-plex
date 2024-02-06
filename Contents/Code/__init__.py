@@ -462,6 +462,9 @@ def Update(metadata, media, lang, force):
         filepath                        = os.path.dirname(episode_part.file)
         filename_noext, filename_ext    = os.path.splitext(filename)
         episode_id                      = ""
+        if TA_CONFIG['version'] == [] or TA_CONFIG['version'] == [0,0,0]:
+          Log.Error("TubeArchivist instance version is unknown or unset. Please review the logs further and ensure that there is connectivity between Plex and TubeArchivist.")
+          break
         if TA_CONFIG['version'] > [0,3,6] and TA_CONFIG['online']:
           episode_id                    = filename_noext
         elif TA_CONFIG['online']: # Assume that if it is online and less that v0.4.0, it is compatible with the legacy file name schema
