@@ -93,7 +93,7 @@ def read_url(url, data=None):
       url_content = urlopen(url, context=SSL_CONTEXT, data=data).read()
     return url_content
   except Exception as e:
-    Log.Error("Error reading or accessing url '%s', Exception: '%s'" % (url, e))
+    Log.Error("Error reading or accessing url '%s', Exception: '%s'" % (url.get_full_url if type(url) is Request else url , e))
     raise e
   
 
