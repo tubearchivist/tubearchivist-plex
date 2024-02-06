@@ -173,6 +173,7 @@ def test_ta_connection():
         Log.Info("TubeArchivist did not respond with a version. Assuming v{} for interpretation.".format('.'.join(str(x) for x in ta_version)))
     except:
       Log.Error("Unable to set the `ta_version`. Check the connection via `ta_ping`.")
+      Log.Debug("Response: %s" % (response))
     if ta_ping == 'pong':
       return True, ta_version
   except Exception as e:
