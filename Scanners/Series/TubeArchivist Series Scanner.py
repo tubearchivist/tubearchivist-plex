@@ -197,6 +197,7 @@ def get_ta_config():
       Log.error("Configuration is missing key '{}'.".format(key))
   if not response['ta_url'].startswith("http") and response['ta_url'].find("://") == -1:
     response['ta_url'] = "http://" + response['ta_url']
+  Log.Debug("TA URL: %s" % (response['ta_url']))
   return response
 
 
