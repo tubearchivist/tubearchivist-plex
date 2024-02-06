@@ -160,7 +160,7 @@ def test_ta_connection():
     try:
       if "version" in response:
         try:
-          if response['version'].startswith("v"):
+          if "v" in response['version'][0]:
             ta_version = [int(x) for x in response['version'][1:].split(".")]
           else:
             ta_version = [int(x) for x in response['version'].split(".")]
