@@ -88,6 +88,8 @@ def setup():
 
 def read_url(url, data=None):
   url_content = ""
+  if not url.startswith('http'):
+    url = "%s%s" % ("http://",url)
   try:
     if data is None:
       url_content = urlopen(url,context=SSL_CONTEXT).read()
