@@ -86,8 +86,6 @@ def GetMediaDir (media, movie=False, file=False):
 
 def read_url(url, data=None):
   url_content = ""
-  if not url.startswith('http'):
-    url = "%s%s" % ("http://",url)
   try:
     if data is None:
       url_content = urlopen(url, context=SSL_CONTEXT).read()
@@ -134,6 +132,8 @@ def load_ta_config():
     Log.Info("Loading TubeArchivist configurations from Plex Agent configuration.")
     if Prefs['tubearchivist_url']:
       TA_CONFIG['ta_url'] = Prefs['tubearchivist_url']
+      if not TA_CONFIG['ta_url'].startswith("http") and TA_CONFIG['ta_url'].find("://") == -1:
+        TA_CONFIG['ta_url'] = "http://" + TA_CONFIG['ta_url']
     if Prefs['tubearchivist_api_key']:
       TA_CONFIG['ta_api_key'] = Prefs['tubearchivist_api_key']
     TA_CONFIG.update(get_ta_config())

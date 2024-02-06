@@ -88,8 +88,6 @@ def setup():
 
 def read_url(url, data=None):
   url_content = ""
-  if not url.startswith('http'):
-    url = "%s%s" % ("http://",url)
   try:
     if data is None:
       url_content = urlopen(url,context=SSL_CONTEXT).read()
@@ -197,6 +195,8 @@ def get_ta_config():
   for key in ['ta_url', 'ta_api_key']:
     if key not in response:
       Log.error("Configuration is missing key '{}'.".format(key))
+  if not response['ta_url'].startswith("http") and response['ta_url'].find("://") == -1:
+    response['ta_url'] = "http://" + response['ta_url']
   return response
 
 
