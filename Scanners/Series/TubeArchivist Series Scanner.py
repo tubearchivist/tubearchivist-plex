@@ -322,6 +322,7 @@ def Scan(path, files, mediaList, subdirs):
   TA_CONFIG['online'] = None
   TA_CONFIG['version'] = []
   TA_CONFIG['online'], TA_CONFIG['version'] = test_ta_connection()
+  Log.info("Initiating scan of library files...")
   VideoFiles.Scan(path, files, mediaList, subdirs)
 
   paths = Utils.SplitPath(path)
@@ -388,7 +389,7 @@ def Scan(path, files, mediaList, subdirs):
             break
 
   Stack.Scan(path, files, mediaList, subdirs)            
-              
+  Log.info("Scan completed for library files.")
 
 if __name__ == '__main__':
   print("{} for Plex!".format(SOURCE))
