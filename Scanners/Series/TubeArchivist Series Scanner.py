@@ -95,7 +95,7 @@ def read_url(url, data=None):
       url_content = urlopen(url,context=SSL_CONTEXT, data=data).read()
     return url_content
   except Exception as e:
-    Log.error("Error reading or accessing url '%s', Exception: '%s'" % (url, e))
+    Log.error("Error reading or accessing url '%s', Exception: '%s'" % (url.get_full_url if type(url) is Request else url, e))
     raise e
 
 
@@ -216,15 +216,15 @@ def test_ta_connection():
             ta_version = [int(x) for x in response['version'][1:].split(".")]
           else:
             ta_version = [int(x) for x in response['version'].split(".")]
-        except AttributeError:
+        except (AttributeError, TypeError):
           ta_version = response['version']
         Log.info("TubeArchivist is running version v{}".format('.'.join(str(x) for x in ta_version)))
       else:
         ta_version = [0,3,6]
         Log.info("TubeArchivist did not respond with a version. Assuming v{} for interpretation.".format('.'.join(str(x) for x in ta_version)))
-    except:
-      Log.error("Unable to set the `ta_version`. Check the connection via `ta_ping`.")
-      Log.debug("Response: %s" % (response))
+    except Exception as e:
+      Log.error("Unable to set the `ta_version`. Check the connection via `ta_ping`. ")
+      Log.debug("Response: %s\nException details: %s" % (response, e))
     if ta_ping == 'pong':
       return True, ta_version
   except Exception as e:
@@ -345,6 +345,9 @@ def Scan(path, files, mediaList, subdirs):
           if match:
             Log.info("File matches expected filename layout.")
             if TA_CONFIG['online']:
+              if TA_CONFIG['version'] == []:
+                Log.error("TubeArchivist instance version is unknown or unset. Please review the logs further and ensure that there is connectivity between Plex and TubeArchivist.")
+                break
               if TA_CONFIG['version'] < [0,3,7]:
                 Log.info("Processing filename with legacy filename format.")
                 originalAirDate = file[0:7]

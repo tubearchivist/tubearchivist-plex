@@ -93,7 +93,7 @@ def read_url(url, data=None):
       url_content = urlopen(url, context=SSL_CONTEXT, data=data).read()
     return url_content
   except Exception as e:
-    Log.Error("Error reading or accessing url '%s', Exception: '%s'" % (url, e))
+    Log.Error("Error reading or accessing url '%s', Exception: '%s'" % (url.get_full_url if type(url) is Request else url, e))
     raise e
   
 
@@ -165,15 +165,15 @@ def test_ta_connection():
             ta_version = [int(x) for x in response['version'][1:].split(".")]
           else:
             ta_version = [int(x) for x in response['version'].split(".")]
-        except AttributeError:
+        except (AttributeError, TypeError):
           ta_version = response['version']
         Log.Info("TubeArchivist is running version v{}".format('.'.join(str(x) for x in ta_version)))
       else:
         ta_version = [0,3,6]
         Log.Info("TubeArchivist did not respond with a version. Assuming v{} for interpretation.".format('.'.join(str(x) for x in ta_version)))
-    except:
-      Log.Error("Unable to set the `ta_version`. Check the connection via `ta_ping`.")
-      Log.Debug("Response: %s" % (response))
+    except Exception as e:
+      Log.Error("Unable to set the `ta_version`. Check the connection via `ta_ping`. ")
+      Log.Debug("Response: %s\nException details: %s" % (response, e))
     if ta_ping == 'pong':
       return True, ta_version
   except Exception as e:
@@ -462,6 +462,9 @@ def Update(metadata, media, lang, force):
         filepath                        = os.path.dirname(episode_part.file)
         filename_noext, filename_ext    = os.path.splitext(filename)
         episode_id                      = ""
+        if TA_CONFIG['version'] == [] or TA_CONFIG['version'] == [0,0,0]:
+          Log.Error("TubeArchivist instance version is unknown or unset. Please review the logs further and ensure that there is connectivity between Plex and TubeArchivist.")
+          break
         if TA_CONFIG['version'] > [0,3,6] and TA_CONFIG['online']:
           episode_id                    = filename_noext
         elif TA_CONFIG['online']: # Assume that if it is online and less that v0.4.0, it is compatible with the legacy file name schema
