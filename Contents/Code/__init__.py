@@ -165,7 +165,7 @@ def test_ta_connection():
             ta_version = [int(x) for x in response['version'][1:].split(".")]
           else:
             ta_version = [int(x) for x in response['version'].split(".")]
-        except AttributeError:
+        except (AttributeError, TypeError):
           ta_version = response['version']
         Log.Info("TubeArchivist is running version v{}".format('.'.join(str(x) for x in ta_version)))
       else:
