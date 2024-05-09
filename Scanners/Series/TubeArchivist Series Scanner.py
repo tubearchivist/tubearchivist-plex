@@ -284,6 +284,47 @@ def get_ta_config():
     return response
 
 
+def check_ta_version_in_response(response):
+    try:
+        if "version" in response:
+            try:
+                if "v" in response["version"][0]:
+                    ta_version = [
+                        [
+                            int(x)
+                            for x in response["version"][1:]
+                            .split(".")
+                            .rstrip("-unstable")
+                        ]
+                    ]
+                else:
+                    ta_version = [
+                        int(x)
+                        for x in response["version"]
+                        .split(".")
+                        .rstrip("-unstable")
+                    ]
+            except (AttributeError, TypeError):
+                ta_version = response["version"]
+            Log.info(
+                "TubeArchivist is running version v{}".format(
+                    ".".join(str(x) for x in ta_version)
+                )
+            )
+        else:
+            ta_version = [0, 3, 6]
+            Log.info(
+                "TubeArchivist did not respond with a version. Assuming v{} for interpretation.".format(  # noqa: E501
+                    ".".join(str(x) for x in ta_version)
+                )
+            )
+    except Exception as e:
+        Log.error(
+            "Unable to set the `ta_version`. Check the connection via `ta_ping`. "  # noqa: E501
+        )
+        Log.debug("Response: %s\nException details: %s" % (response, e))
+
+
 def test_ta_connection():
     if not TA_CONFIG:
         return
@@ -307,36 +348,7 @@ def test_ta_connection():
         )
         ta_ping = response["response"]
         ta_version = []
-        try:
-            if "version" in response:
-                try:
-                    if "v" in response["version"][0]:
-                        ta_version = [
-                            int(x) for x in response["version"][1:].split(".")
-                        ]
-                    else:
-                        ta_version = [
-                            int(x) for x in response["version"].split(".")
-                        ]
-                except (AttributeError, TypeError):
-                    ta_version = response["version"]
-                Log.info(
-                    "TubeArchivist is running version v{}".format(
-                        ".".join(str(x) for x in ta_version)
-                    )
-                )
-            else:
-                ta_version = [0, 3, 6]
-                Log.info(
-                    "TubeArchivist did not respond with a version. Assuming v{} for interpretation.".format(  # noqa: E501
-                        ".".join(str(x) for x in ta_version)
-                    )
-                )
-        except Exception as e:
-            Log.error(
-                "Unable to set the `ta_version`. Check the connection via `ta_ping`. "  # noqa: E501
-            )
-            Log.debug("Response: %s\nException details: %s" % (response, e))
+        ta_version = check_ta_version_in_response(response)
         if ta_ping == "pong":
             return True, ta_version
     except Exception as e:
