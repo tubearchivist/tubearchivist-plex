@@ -506,7 +506,7 @@ def get_ta_channel_metadata(chid):
         raise e
 
 
-def Scan(path, files, mediaList, subdirs):
+def Scan(path, files, mediaList, subdirs):  # noqa: C901
     setup()
     load_ta_config()
     TA_CONFIG["online"] = None
