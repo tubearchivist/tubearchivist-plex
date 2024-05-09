@@ -97,6 +97,12 @@ YOUTUBE_CATEGORY_ID = {
     "44": "Trailers",
 }
 
+# Fix getfilesystemencoding if filesystem doesn't have a default encoding.
+sys.getfilesystemencoding = (
+    sys.getfilesystemencoding
+    if sys.getfilesystemencoding()
+    else lambda: "utf-8"
+)
 
 """Mini Functions"""
 
