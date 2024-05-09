@@ -76,8 +76,8 @@ def setup():
                 "Android": "/storage/emulated/0/Plex Media Server",
             }
             PLEX_ROOT = os.path.expandvars(
-                path_location[Platform.OS.lower()]  # noqa: F821
-                if Platform.OS.lower() in path_location  # noqa: F821
+                path_location[Platform.OS.lower()]  # type: ignore # noqa: F821
+                if Platform.OS.lower() in path_location  # type: ignore # noqa: F821, E501
                 else "~"
             )  # Platform.OS:  Windows, MacOSX, or Linux
 
@@ -159,7 +159,7 @@ def set_logging(
     if os.sep == "\\":
         dos_path = (
             os.path.abspath(log_file)
-            if isinstance(log_file, unicode)  # noqa: F821
+            if isinstance(log_file, unicode)  # type: ignore # noqa: F821
             else os.path.abspath(log_file.decode("utf-8"))
         )
         log_file = (
@@ -285,6 +285,7 @@ def get_ta_config():
 
 
 def check_ta_version_in_response(response):
+    ta_version = []
     try:
         if "version" in response:
             try:
@@ -323,6 +324,7 @@ def check_ta_version_in_response(response):
             "Unable to set the `ta_version`. Check the connection via `ta_ping`. "  # noqa: E501
         )
         Log.debug("Response: %s\nException details: %s" % (response, e))
+    return ta_version
 
 
 def test_ta_connection():

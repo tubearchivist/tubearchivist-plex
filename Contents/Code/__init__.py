@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import datetime
-import hashlib
+# import datetime
+# import hashlib
 import inspect
 import json
 import os
@@ -12,7 +12,8 @@ import sys
 from io import open
 
 import urllib2
-from lxml import etree
+
+# from lxml import etree
 
 try:
     from ssl import (
@@ -24,10 +25,10 @@ try:
     from urllib.request import Request, urlopen  # Python >= 3.0
 except ImportError:
     from urllib2 import Request, urlopen  # Python == 2.x
-try:
-    from urllib.parse import quote
-except:
-    from urllib import quote
+# try:
+#     from urllib.parse import quote
+# except ImportError:
+#     from urllib import quote
 
 # import inspect
 
@@ -47,16 +48,17 @@ CachePath = os.path.join(
     "DataItems",
 )
 PLEX_LIBRARY = {}
-PLEX_LIBRARY_URL = "http://localhost:32400/library/sections/"  # Allow to get the library name to get a log per library https://support.plex.tv/hc/en-us/articles/204059436-Finding-your-account-token-X-Plex-Token
+# Allow to get the library name to get a log per library https://support.plex.tv/hc/en-us/articles/204059436-Finding-your-account-token-X-Plex-Token  # noqa: E501
+PLEX_LIBRARY_URL = "http://localhost:32400/library/sections/"
 SOURCE = "TubeArchivist Agent"
 CON_AGENTS = ["com.plexapp.agents.none"]
 REF_AGENTS = ["com.plexapp.agents.localmedia"]
-LANGUAGES = [Locale.Language.NoLanguage, Locale.Language.English]
+LANGUAGES = [Locale.Language.NoLanguage, Locale.Language.English]  # type: ignore # noqa: F821, E501
 
 SSL_CONTEXT = ssl.SSLContext(SSL_PROTOCOL)
 FILTER_CHARS = "\\/:*?<>|;"
 youtube_regexs = [
-    "[0-9]{8}_[a-zA-Z0-9]{11}_*.*",  # YYYYMMDD_XXXXXXXXXXX_TITLE.ext | Legacy TA title
+    "[0-9]{8}_[a-zA-Z0-9]{11}_*.*",  # YYYYMMDD_XXXXXXXXXXX_TITLE.ext | Legacy TA title  # noqa: E501
     "[a-zA-Z0-9]{11}.*",  # XXXXXXXXXXX.ext                | v0.4.0+
 ]
 
@@ -96,18 +98,30 @@ YOUTUBE_CATEGORY_ID = {
 }
 
 
-###Mini Functions ###
+"""Mini Functions"""
+
+"""
+Avoids 1, 10, 2, 20...
+#Usage: list.sort(key=natural_sort_key), sorted(list, key=natural_sort_key)
+"""
+
+
 def natural_sort_key(s):
     return [
         int(text) if text.isdigit() else text
         for text in re.split(re.compile("([0-9]+)"), str(s).lower())
-    ]  ### Avoid 1, 10, 2, 20... #Usage: list.sort(key=natural_sort_key), sorted(list, key=natural_sort_key)
+    ]
+
+
+"""
+Make sure the path is unicode, if it is not, decode using OS filesystem's encoding  # noqa: E501
+"""
 
 
 def sanitize_path(p):
     return (
-        p if isinstance(p, unicode) else p.decode(sys.getfilesystemencoding())
-    )  ### Make sure the path is unicode, if it is not, decode using OS filesystem's encoding ###
+        p if isinstance(p, unicode) else p.decode(sys.getfilesystemencoding())  # type: ignore # noqa: F821, E501
+    )
 
 
 #####################
@@ -170,7 +184,7 @@ def read_url(url, data=None):
             url_content = urlopen(url, context=SSL_CONTEXT, data=data).read()
         return url_content
     except Exception as e:
-        Log.Error(
+        Log.Error(  # type: ignore # noqa: F821
             "Error reading or accessing url '%s', Exception: '%s'"
             % (url.get_full_url if type(url) is Request else url, e)
         )
@@ -184,27 +198,30 @@ def read_file(localfile):
             file_content = file.read()
         return file_content
     except Exception as e:
-        Log.Error(
+        Log.Error(  # type: ignore # noqa: F821
             "Error reading or accessing file '%s', Exception: '%s'"
             % (localfile, e)
         )
         raise e
 
 
-### Plex Library XML ###
+"""
+###Plex Library XML ###
 # token_file_path = os.path.join(PLEX_ROOT, "X-Plex-Token.id")
 # if os.path.isfile(token_file_path):
 #   Log.Info(u"'X-Plex-Token.id' file present")
 #   token_file=Data.Load(token_file_path)
 #   if token_file:  PLEX_LIBRARY_URL += "?X-Plex-Token=" + token_file.strip()
-#   #Log.Info(PLEX_LIBRARY_URL) ## Security risk if posting logs with token displayed
+#   #Log.Info(PLEX_LIBRARY_URL)
+  ## Security risk if posting logs with token displayed
 # try:
 #   library_xml = etree.fromstring(urllib2.urlopen(PLEX_LIBRARY_URL).read())
 #   for library in library_xml.iterchildren('Directory'):
 #     for path in library.iterchildren('Location'):
 #       PLEX_LIBRARY[path.get("path")] = library.get("title")
 # except Exception as e:
-#   Log.Info(u"Place correct Plex token in {} file to have a log per library - https://support.plex.tv/hc/en-us/articles/204059436-Finding-your-account-token-X-Plex-Token, Error: {}".format(token_file_path, str(e)))
+#   Log.Info(u"Place correct Plex token in {} file to have a log per library - https://support.plex.tv/hc/en-us/articles/204059436-Finding-your-account-token-X-Plex-Token, Error: {}".format(token_file_path, str(e)))  # noqa: E501
+"""
 
 
 def load_ta_config():
@@ -213,19 +230,21 @@ def load_ta_config():
         TA_CONFIG["online"], TA_CONFIG["version"] = test_ta_connection()
         return
     else:
-        Log.Info(
-            "Loading TubeArchivist configurations from Plex Agent configuration."
+        Log.Info(  # type: ignore # noqa: F821
+            "Loading TubeArchivist configurations from Plex Agent configuration."  # noqa: E501
         )
-        if Prefs["tubearchivist_url"]:
-            TA_CONFIG["ta_url"] = Prefs["tubearchivist_url"]
+        if Prefs["tubearchivist_url"]:  # type: ignore # noqa: F821
+            TA_CONFIG["ta_url"] = Prefs["tubearchivist_url"]  # type: ignore # noqa: F821, E501
             if (
                 not TA_CONFIG["ta_url"].startswith("http")
                 and TA_CONFIG["ta_url"].find("://") == -1
             ):
                 TA_CONFIG["ta_url"] = "http://" + TA_CONFIG["ta_url"]
-        Log.Debug("TA URL: %s" % (TA_CONFIG["ta_url"]))
-        if Prefs["tubearchivist_api_key"]:
-            TA_CONFIG["ta_api_key"] = Prefs["tubearchivist_api_key"]
+        Log.Debug("TA URL: %s" % (TA_CONFIG["ta_url"]))  # type: ignore # noqa: F821, E501
+        if Prefs["tubearchivist_api_key"]:  # type: ignore # noqa: F821
+            TA_CONFIG["ta_api_key"] = Prefs[  # type: ignore # noqa: F821
+                "tubearchivist_api_key"
+            ]
         TA_CONFIG.update(get_ta_config())
         TA_CONFIG["online"] = False
         TA_CONFIG["version"] = [0, 0, 0]
@@ -235,8 +254,8 @@ def load_ta_config():
 def get_ta_config():
     AGENT_LOCATION = os.path.join(PLUGIN_PATH, "Contents")
     CONFIG_NAME = "config.json"
-    Log.Info(
-        "Checking if there are any overriding configurations in a local file..."
+    Log.Info(  # type: ignore # noqa: F821
+        "Checking if there are any overriding configurations in local file..."
     )
     return json.loads(
         read_file(os.path.join(AGENT_LOCATION, CONFIG_NAME))
@@ -249,8 +268,8 @@ def test_ta_connection():
     if not TA_CONFIG:
         return
     try:
-        Log.Info(
-            "Attempting to connect to TubeArchivist at {} with provided token from `ta_config.json` file to test connection and poll version details.".format(
+        Log.Info(  # type: ignore # noqa: F821
+            "Attempting to connect to TubeArchivist at {} with provided token from `ta_config.json` file to test connection and poll version details.".format(  # noqa: E501
                 TA_CONFIG["ta_url"]
             )
         )
@@ -268,50 +287,58 @@ def test_ta_connection():
         )
         ta_ping = response["response"]
         ta_version = []
-        try:
-            if "version" in response:
-                try:
-                    if "v" in response["version"][0]:
-                        ta_version = [
-                            int(x)
-                            for x in response["version"][1:]
-                            .split(".")
-                            .rstrip("-unstable")
-                        ]
-                    else:
-                        ta_version = [
-                            int(x)
-                            for x in response["version"]
-                            .split(".")
-                            .rstrip("-unstable")
-                        ]
-                except (AttributeError, TypeError):
-                    ta_version = response["version"]
-                Log.Info(
-                    "TubeArchivist is running version v{}".format(
-                        ".".join(str(x) for x in ta_version)
-                    )
-                )
-            else:
-                ta_version = [0, 3, 6]
-                Log.Info(
-                    "TubeArchivist did not respond with a version. Assuming v{} for interpretation.".format(
-                        ".".join(str(x) for x in ta_version)
-                    )
-                )
-        except Exception as e:
-            Log.Error(
-                "Unable to set the `ta_version`. Check the connection via `ta_ping`. "
-            )
-            Log.Debug("Response: %s\nException details: %s" % (response, e))
+        ta_version = check_ta_version_in_response(response)
         if ta_ping == "pong":
             return True, ta_version
     except Exception as e:
-        Log.Error(
+        Log.Error(  # type: ignore # noqa: F821
             "Error connecting to TubeArchivist with URL '%s', Exception: '%s'"
             % (TA_CONFIG["ta_url"], e)
         )
         raise e
+
+
+def check_ta_version_in_response(response):
+    ta_version = []
+    try:
+        if "version" in response:
+            try:
+                if "v" in response["version"][0]:
+                    ta_version = [
+                        int(x)
+                        for x in response["version"][1:]
+                        .split(".")
+                        .rstrip("-unstable")
+                    ]
+                else:
+                    ta_version = [
+                        int(x)
+                        for x in response["version"]
+                        .split(".")
+                        .rstrip("-unstable")
+                    ]
+            except (AttributeError, TypeError):
+                ta_version = response["version"]
+            Log.Info(  # type: ignore # noqa: F821
+                "TubeArchivist is running version v{}".format(
+                    ".".join(str(x) for x in ta_version)
+                )
+            )
+        else:
+            ta_version = [0, 3, 6]
+            Log.Info(  # type: ignore # noqa: F821
+                "TubeArchivist did not respond with a version. Assuming v{} for interpretation.".format(  # noqa: E501
+                    ".".join(str(x) for x in ta_version)
+                )
+            )
+    except Exception as e:
+        Log.Error(  # type: ignore # noqa: F821
+            "Unable to set the `ta_version`. Check the connection via `ta_ping`. "  # noqa: E501
+        )
+        Log.Debug(  # type: ignore # noqa: F821
+            "Response: %s\nException details: %s" % (response, e)
+        )
+    return ta_version
 
 
 def get_ta_metadata(id, mtype="video"):
@@ -320,8 +347,8 @@ def get_ta_metadata(id, mtype="video"):
     if not TA_CONFIG:
         return
     try:
-        Log.Info(
-            "Attempting to connect to TubeArchivist to lookup YouTube {}: {}".format(
+        Log.Info(  # type: ignore # noqa: F821
+            "Attempting to connect to TubeArchivist to lookup YouTube {}: {}".format(  # noqa: E501
                 mtype, id
             )
         )
@@ -339,8 +366,8 @@ def get_ta_metadata(id, mtype="video"):
         )
         return response
     except Exception as e:
-        Log.Error(
-            "Error connecting to TubeArchivist with URL '{}', Exception: '{}'".format(
+        Log.Error(  # type: ignore # noqa: F821
+            "Error connecting to TubeArchivist with URL '{}', Exception: '{}'".format(  # noqa: E501
                 request_url, e
             )
         )
@@ -350,21 +377,21 @@ def get_ta_metadata(id, mtype="video"):
 def get_ta_video_metadata(ytid):
     mtype = "video"
     if not TA_CONFIG:
-        Log.Error("No configurations in TA_CONFIG.")
+        Log.Error("No configurations in TA_CONFIG.")  # type: ignore # noqa: F821, E501
         return
     if not ytid:
-        Log.Error("No {} ID present.".format(mtype))
+        Log.Error("No {} ID present.".format(mtype))  # type: ignore # noqa: F821, E501
         return
     try:
         vid_response = get_ta_metadata(ytid)
-        Log.Info(
+        Log.Info(  # type: ignore # noqa: F821
             "Response from TubeArchivist received for YouTube {}: {}".format(
                 mtype, ytid
             )
         )
         if vid_response:
             metadata = {}
-            if Prefs["show_channel_id"]:
+            if Prefs["show_channel_id"]:  # type: ignore # noqa: F821
                 metadata["show"] = "{} [{}]".format(
                     vid_response["data"]["channel"]["channel_name"],
                     vid_response["data"]["channel"]["channel_id"],
@@ -375,10 +402,10 @@ def get_ta_video_metadata(ytid):
                 )
             metadata["ytid"] = vid_response["data"]["youtube_id"]
             metadata["title"] = vid_response["data"]["title"]
-            metadata["processed_date"] = Datetime.ParseDate(
+            metadata["processed_date"] = Datetime.ParseDate(  # type: ignore # noqa: F821, E501
                 vid_response["data"]["published"]
             )
-            video_refresh = Datetime.ParseDate(
+            video_refresh = Datetime.ParseDate(  # type: ignore # noqa: F821
                 vid_response["data"]["vid_last_refresh"]
             )
             metadata["refresh_date"] = video_refresh.strftime("%Y%m%d")
@@ -396,13 +423,13 @@ def get_ta_video_metadata(ytid):
                 ]
             return metadata
         else:
-            Log.Error(
-                "Empty response returned from %s when requesting data about %s."
+            Log.Error(  # type: ignore # noqa: F821
+                "Empty response returned from %s when requesting data about %s."  # noqa: E501
                 % (TA_CONFIG["ta_url"], mtype)
             )
     except Exception as e:
-        Log.Error(
-            "Error processing %s response from TubeArchivist at URL '%s', Exception: '%s'"
+        Log.Error(  # type: ignore # noqa: F821
+            "Error processing %s response from TubeArchivist at URL '%s', Exception: '%s'"  # noqa: E501
             % (mtype, TA_CONFIG["ta_url"], e)
         )
         raise e
@@ -411,21 +438,21 @@ def get_ta_video_metadata(ytid):
 def get_ta_channel_metadata(chid):
     mtype = "channel"
     if not TA_CONFIG:
-        Log.Error("No configurations in TA_CONFIG.")
+        Log.Error("No configurations in TA_CONFIG.")  # type: ignore # noqa: F821, E501
         return
     if not chid:
-        Log.Error("No {} ID present.".format(mtype))
+        Log.Error("No {} ID present.".format(mtype))  # type: ignore # noqa: F821, E501
         return
     try:
         ch_response = get_ta_metadata(chid, mtype="channel")
-        Log.Info(
+        Log.Info(  # type: ignore # noqa: F821
             "Response from TubeArchivist received for YouTube {}: {}".format(
                 mtype, chid
             )
         )
         if ch_response:
             metadata = {}
-            if Prefs["show_channel_id"]:
+            if Prefs["show_channel_id"]:  # type: ignore # noqa: F821
                 metadata["show"] = "{} [{}]".format(
                     ch_response["data"]["channel_name"],
                     ch_response["data"]["channel_id"],
@@ -434,7 +461,7 @@ def get_ta_channel_metadata(chid):
                 metadata["show"] = "{}".format(
                     ch_response["data"]["channel_name"]
                 )
-            channel_refresh = Datetime.ParseDate(
+            channel_refresh = Datetime.ParseDate(  # type: ignore # noqa: F821
                 ch_response["data"]["channel_last_refresh"]
             )
             metadata["refresh_date"] = channel_refresh.strftime("%Y%m%d")
@@ -447,13 +474,13 @@ def get_ta_channel_metadata(chid):
             metadata["tvart_url"] = ch_response["data"]["channel_tvart_url"]
             return metadata
         else:
-            Log.Error(
-                "Empty response returned from %s when requesting data about %s."
+            Log.Error(  # type: ignore # noqa: F821
+                "Empty response returned from %s when requesting data about %s."  # noqa: E501
                 % (TA_CONFIG["ta_url"], mtype)
             )
     except Exception as e:
-        Log.Error(
-            "Error processing %s response from TubeArchivist at URL '%s', Exception: '%s'"
+        Log.Error(  # type: ignore # noqa: F821
+            "Error processing %s response from TubeArchivist at URL '%s', Exception: '%s'"  # noqa: E501
             % (mtype, TA_CONFIG["ta_url"], e)
         )
         raise e
@@ -475,7 +502,7 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
         if ext in [".vtt"]:
             codec = "vtt"
             format = None
-            lang_match = Locale.Language.Match(sub["lang"])
+            lang_match = Locale.Language.Match(sub["lang"])  # type: ignore # noqa: F821, E501
 
             if os.path.exists(filepath):
                 filename = os.path.basename(sub["media_url"])
@@ -495,8 +522,8 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
                         additional_classifications.append("Forced")
                     if not additional_classifications:
                         additional_classifications.append("None")
-                    Log.Info(
-                        "Locally downloaded subtitle identified for video ID {} with language code '{}'. Additional classifications: {}".format(
+                    Log.Info(  # type: ignore # noqa: F821
+                        "Locally downloaded subtitle identified for video ID {} with language code '{}'. Additional classifications: {}".format(  # noqa: E501
                             vid_metadata["ytid"],
                             lang_match,
                             ", ".join(additional_classifications),
@@ -506,7 +533,7 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
                     for item in media_obj.items:
                         for part in item.parts:
                             part.subtitles[lang_match][filename] = (
-                                Proxy.LocalFile(
+                                Proxy.LocalFile(  # type: ignore # noqa: F821
                                     plex_sub_path,
                                     codec=codec,
                                     format=format,
@@ -521,14 +548,14 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
                     lang_sub_map[lang_match].append(filename)
 
                 else:
-                    Log.Error(
-                        "Cannot find subtitle locally. Subtitle does not exist with video's path replacement '{}'.".format(
+                    Log.Error(  # type: ignore # noqa: F821
+                        "Cannot find subtitle locally. Subtitle does not exist with video's path replacement '{}'.".format(  # noqa: E501
                             plex_sub_path
                         )
                     )
             else:
-                Log.Error(
-                    "Cannot find subtitle locally. Video's path of '{}' does not exist or is inaccessible.".format(
+                Log.Error(  # type: ignore # noqa: F821
+                    "Cannot find subtitle locally. Video's path of '{}' does not exist or is inaccessible.".format(  # noqa: E501
                         filepath
                     )
                 )
@@ -546,16 +573,16 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
     for item in media_obj.items:
         for part in item.parts:
             # Log.Debug("Validating keys for {}.".format(lang_pub_map))
-            # Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\n".format(DebugObject(part),DebugObject(part.subtitles)))
+            # Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\n".format(DebugObject(part),DebugObject(part.subtitles)))  # noqa: E501
             # for language in part.subtitles.keys():
-            #   Log.Debug("\nLANG({}): {}".format(language, DebugObject(part.subtitles[language])))
+            #   Log.Debug("\nLANG({}): {}".format(language, DebugObject(part.subtitles[language])))  # noqa: E501
             for language in lang_sub_map.keys():
                 part.subtitles[language].validate_keys(lang_pub_map)
             for language in list(
                 set(part.subtitles.keys()) - set(lang_sub_map.keys())
             ):
-                Log.Info(
-                    "Removing language code '{}' that is no longer available as a locally downloaded subtitle for video ID {}.".format(
+                Log.Info(  # type: ignore # noqa: F821
+                    "Removing language code '{}' that is no longer available as a locally downloaded subtitle for video ID {}.".format(  # noqa: E501
                         language, vid_metadata["ytid"]
                     )
                 )
@@ -564,15 +591,15 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):
     # for item in media_obj.items:
     #   for part in item.parts:
     #     for language in part.subtitles.keys():
-    #       Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\n".format(DebugObject(part),DebugObject(part.subtitles)))
+    #       Log.Debug("Output part details: \nPART: {}\nSUBTITLES: {}\n".format(DebugObject(part),DebugObject(part.subtitles)))  # noqa: E501
     #       for language in part.subtitles.keys():
-    #         Log.Debug("\nLANG({}): {}".format(language, DebugObject(part.subtitles[language])))
+    #         Log.Debug("\nLANG({}): {}".format(language, DebugObject(part.subtitles[language])))  # noqa: E501
 
 
 def GetLibraryRootPath(dir):
     library, root, path = "", "", ""
     for root in [
-        os.sep.join(dir.split(os.sep)[0 : x + 2])
+        os.sep.join(dir.split(os.sep)[0 : x + 2])  # noqa: E203
         for x in range(0, dir.count(os.sep))
     ]:
         if root in PLEX_LIBRARY:
@@ -580,19 +607,19 @@ def GetLibraryRootPath(dir):
             path = os.path.relpath(dir, root)
             break
     else:  # 401 no right to list libraries (windows)
-        Log.Info("[X] Library access denied")
+        Log.Info("[X] Library access denied")  # type: ignore # noqa: F821
         filename = os.path.join(CachePath, "_Logs", "_root_.scanner.log")
         if os.path.isfile(filename):
-            Log.Info(
+            Log.Info(  # type: ignore # noqa: F821
                 '[_] TubeArchivist root scanner log file present: "{}"'.format(
                     filename
                 )
             )
-            line = Core.storage.load(
+            line = Core.storage.load(  # type: ignore # noqa: F821
                 filename
             )  # with open(filename, 'rb') as file:  line=file.read()
             for root in [
-                os.sep.join(dir.split(os.sep)[0 : x + 2])
+                os.sep.join(dir.split(os.sep)[0 : x + 2])  # noqa: E203
                 for x in range(dir.count(os.sep) - 1, -1, -1)
             ]:
                 if "root: '{}'".format(root) in line:
@@ -601,7 +628,7 @@ def GetLibraryRootPath(dir):
             else:
                 path, root = "_unknown_folder", ""
         else:
-            Log.Info(
+            Log.Info(  # type: ignore # noqa: F821
                 '[!] TubeArchivist root scanner log file missing: "{}"'.format(
                     filename
                 )
@@ -617,7 +644,7 @@ def Search(results, media, lang, manual):
     try:
         filename = sanitize_path(filename)
     except Exception as e:
-        Log.Error(
+        Log.Error(  # type: ignore # noqa: F821
             "Failure to sanitize filename: '{}', Exception: '{}'".format(
                 filename, e
             )
@@ -625,16 +652,16 @@ def Search(results, media, lang, manual):
     try:
         filename = os.path.basename(filename)
     except Exception as e:
-        Log.Error(
-            "Failure to get basename of filename: '{}', Exception: '{}'".format(
+        Log.Error(  # type: ignore # noqa: F821
+            "Failure to get basename of filename: '{}', Exception: '{}'".format(  # noqa: E501
                 filename, e
             )
         )
     try:
         filename = urllib2.unquote(filename)
     except Exception as e:
-        Log.Error(
-            "Failure to remove invalid characters in filename: '{}', Exception: '{}'".format(
+        Log.Error(  # type: ignore # noqa: F821
+            "Failure to remove invalid characters in filename: '{}', Exception: '{}'".format(  # noqa: E501
                 filename, e
             )
         )
@@ -644,10 +671,12 @@ def Search(results, media, lang, manual):
             and displayname.rindex("]") > displayname.rindex("[")
         ):
             guid = displayname[
-                (displayname.rindex("[") + 1) : (displayname.rindex("]"))
+                (displayname.rindex("[") + 1) : (  # noqa: E203
+                    displayname.rindex("]")
+                )  # noqa: E203
             ]
             results.Append(
-                MetadataSearchResult(
+                MetadataSearchResult(  # type: ignore # noqa: F821
                     id="tubearchivist|{}|{}".format(
                         guid, os.path.basename(dir)
                     ),
@@ -657,27 +686,27 @@ def Search(results, media, lang, manual):
                     lang=lang,
                 )
             )
-            Log.Info(
-                "TubeArchivist ID was found - Display Name: {} | File: {}".format(
+            Log.Info(  # type: ignore # noqa: F821
+                "TubeArchivist ID was found - Display Name: {} | File: {}".format(  # noqa: E501
                     displayname, filename
                 )
             )
             return
         else:
-            Log.Error(
-                "TubeArchivist ID not found - Display Name: {} | File: {}".format(
+            Log.Error(  # type: ignore # noqa: F821
+                "TubeArchivist ID not found - Display Name: {} | File: {}".format(  # noqa: E501
                     displayname, filename
                 )
             )
     except Exception as e:
-        Log.Error(
-            'Search for file with filename: "{}" - Failed to find and process TubeArchivist ID, Exception: "{}"'.format(
+        Log.Error(  # type: ignore # noqa: F821
+            'Search for file with filename: "{}" - Failed to find and process TubeArchivist ID, Exception: "{}"'.format(  # noqa: E501
                 filename, e
             )
         )
     library, root, path = GetLibraryRootPath(dir)
     results.Append(
-        MetadataSearchResult(
+        MetadataSearchResult(  # type: ignore # noqa: F821
             id="tubearchivist|{}|{}".format(
                 path.split(os.sep)[-2] if os.sep in path else "", dir
             ),
@@ -709,7 +738,7 @@ def Update(metadata, media, lang, force):
             ch_metadata["refresh_date"], ch_metadata["thumb_url"]
         )
         if thumb_channel and thumb_channel not in metadata.posters:
-            metadata.posters[thumb_channel] = Proxy.Media(
+            metadata.posters[thumb_channel] = Proxy.Media(  # type: ignore # noqa: F821, E501
                 read_url(
                     Request(
                         "{}{}".format(
@@ -723,20 +752,22 @@ def Update(metadata, media, lang, force):
                     )
                 ),
                 sort_order=(
-                    1 if Prefs["media_poster_source"] == "Channel" else 2
+                    1
+                    if Prefs["media_poster_source"] == "Channel"  # type: ignore # noqa: F821, E501
+                    else 2
                 ),
             )
-            Log("[X] Posters: {}".format(thumb_channel))
+            Log("[X] Posters: {}".format(thumb_channel))  # type: ignore # noqa: F821, E501
         elif thumb_channel and thumb_channel in metadata.posters:
-            Log("[_] Posters: {}".format(thumb_channel))
+            Log("[_] Posters: {}".format(thumb_channel))  # type: ignore # noqa: F821, E501
         else:
-            Log("[ ] Posters: {}".format(thumb_channel))
+            Log("[ ] Posters: {}".format(thumb_channel))  # type: ignore # noqa: F821, E501
 
         tvart_channel = "{}_{}".format(
             ch_metadata["refresh_date"], ch_metadata["tvart_url"]
         )
         if tvart_channel and tvart_channel not in metadata.art:
-            metadata.art[tvart_channel] = Proxy.Media(
+            metadata.art[tvart_channel] = Proxy.Media(  # type: ignore # noqa: F821, E501
                 read_url(
                     Request(
                         "{}{}".format(
@@ -750,20 +781,22 @@ def Update(metadata, media, lang, force):
                     )
                 ),
                 sort_order=(
-                    1 if Prefs["media_poster_source"] == "Channel" else 2
+                    1
+                    if Prefs["media_poster_source"] == "Channel"  # type: ignore # noqa: F821, E501
+                    else 2
                 ),
             )
-            Log("[X] Art: {}".format(tvart_channel))
+            Log("[X] Art: {}".format(tvart_channel))  # type: ignore # noqa: F821, E501
         elif tvart_channel and tvart_channel in metadata.art:
-            Log("[_] Art: {}".format(tvart_channel))
+            Log("[_] Art: {}".format(tvart_channel))  # type: ignore # noqa: F821, E501
         else:
-            Log("[ ] Art: {}".format(tvart_channel))
+            Log("[ ] Art: {}".format(tvart_channel))  # type: ignore # noqa: F821, E501
 
         banner_channel = "{}_{}".format(
             ch_metadata["refresh_date"], ch_metadata["banner_url"]
         )
         if banner_channel and banner_channel not in metadata.banners:
-            metadata.banners[banner_channel] = Proxy.Media(
+            metadata.banners[banner_channel] = Proxy.Media(  # type: ignore # noqa: F821, E501
                 read_url(
                     Request(
                         "{}{}".format(
@@ -777,14 +810,16 @@ def Update(metadata, media, lang, force):
                     )
                 ),
                 sort_order=(
-                    1 if Prefs["media_poster_source"] == "Channel" else 2
+                    1
+                    if Prefs["media_poster_source"] == "Channel"  # type: ignore # noqa: F821, E501
+                    else 2
                 ),
             )
-            Log("[X] Banners: {}".format(banner_channel))
+            Log("[X] Banners: {}".format(banner_channel))  # type: ignore # noqa: F821, E501
         elif banner_channel and banner_channel in metadata.banners:
-            Log("[_] Banners: {}".format(banner_channel))
+            Log("[_] Banners: {}".format(banner_channel))  # type: ignore # noqa: F821, E501
         else:
-            Log("[ ] Banners: {}".format(banner_channel))
+            Log("[ ] Banners: {}".format(banner_channel))  # type: ignore # noqa: F821, E501
 
         metadata.roles.clear()
         role = metadata.roles.new()
@@ -795,7 +830,7 @@ def Update(metadata, media, lang, force):
         metadata.summary = ch_metadata["description"]
         metadata.studio = "YouTube"
 
-        Log.Info(
+        Log.Info(  # type: ignore # noqa: F821
             "Channel metadata updates completed for {}.".format(channel_title)
         )
 
@@ -816,15 +851,15 @@ def Update(metadata, media, lang, force):
                     0,
                     0,
                 ]:
-                    Log.Error(
-                        "TubeArchivist instance version is unknown or unset. Please review the logs further and ensure that there is connectivity between Plex and TubeArchivist."
+                    Log.Error(  # type: ignore # noqa: F821
+                        "TubeArchivist instance version is unknown or unset. Please review the logs further and ensure that there is connectivity between Plex and TubeArchivist."  # noqa: E501
                     )
                     break
                 if TA_CONFIG["version"] > [0, 3, 6] and TA_CONFIG["online"]:
                     episode_id = filename_noext
                 elif TA_CONFIG[
                     "online"
-                ]:  # Assume that if it is online and less that v0.4.0, it is compatible with the legacy file name schema
+                ]:  # Assume that if it is online and less that v0.4.0, it is compatible with the legacy file name schema  # noqa: E501
                     episode_id = filename[9:20]
 
                 if TA_CONFIG["online"]:
@@ -847,7 +882,7 @@ def Update(metadata, media, lang, force):
                         vid_metadata["refresh_date"], vid_metadata["thumb_url"]
                     )
                     if thumb_vid and thumb_vid not in episode.thumbs:
-                        episode.thumbs[thumb_vid] = Proxy.Media(
+                        episode.thumbs[thumb_vid] = Proxy.Media(  # type: ignore # noqa: F821, E501
                             read_url(
                                 Request(
                                     "{}{}".format(
@@ -863,40 +898,40 @@ def Update(metadata, media, lang, force):
                             ),
                             sort_order=(
                                 1
-                                if Prefs["media_poster_source"] == "Channel"
+                                if Prefs["media_poster_source"] == "Channel"  # type: ignore # noqa: F821, E501
                                 else 2
                             ),
                         )
-                        Log("[X] Thumbs: {}".format(thumb_vid))
+                        Log("[X] Thumbs: {}".format(thumb_vid))  # type: ignore # noqa: F821, E501
                     elif thumb_vid and thumb_vid in episode.thumbs:
-                        Log("[_] Thumbs: {}".format(thumb_vid))
+                        Log("[_] Thumbs: {}".format(thumb_vid))  # type: ignore # noqa: F821, E501
                     else:
-                        Log("[ ] Thumbs: {}".format(thumb_vid))
+                        Log("[ ] Thumbs: {}".format(thumb_vid))  # type: ignore # noqa: F821, E501
 
                     if vid_metadata["has_subtitles"]:
                         PullTASubtitles(vid_metadata, filepath, episode_media)
                     else:
-                        Log.Info(
-                            "No downloaded subtitles associated with video ID {}. No request made to TubeArchivist.".format(
+                        Log.Info(  # type: ignore # noqa: F821
+                            "No downloaded subtitles associated with video ID {}. No request made to TubeArchivist.".format(  # noqa: E501
                                 episode_id
                             )
                         )
-                    Log.Info(
-                        "Episode '{} - {}' for channel {} processed successfully.".format(
+                    Log.Info(  # type: ignore # noqa: F821
+                        "Episode '{} - {}' for channel {} processed successfully.".format(  # noqa: E501
                             episode_id, episode.title, channel_title
                         )
                     )
-        Log.Info(
+        Log.Info(  # type: ignore # noqa: F821
             "All episode files processed for {}. Count: {}".format(
                 channel_title, str(episodes)
             )
         )
-        Log.Info(
-            "=== End Of Agent's Update Call, errors after this are Plex related ==="
+        Log.Info(  # type: ignore # noqa: F821
+            "=== End Of Agent's Update Call, errors after this are Plex related ==="  # noqa: E501
         )
 
 
-class TubeArchivistYTSeriesAgent(Agent.TV_Shows):
+class TubeArchivistYTSeriesAgent(Agent.TV_Shows):  # type: ignore # noqa: F821
     (
         name,
         primary_provider,
@@ -917,8 +952,8 @@ class TubeArchivistYTSeriesAgent(Agent.TV_Shows):
 
 def Start():
     # HTTP.CacheTime                  = CACHE_1MONTH
-    HTTP.Headers["User-Agent"] = (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"  # Generisize further
+    HTTP.Headers["User-Agent"] = (  # type: ignore # noqa: F821
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"  # Generisize further  # noqa: E501
     )
-    HTTP.Headers["Accept-Language"] = "en-us"
-    Log("Starting up TubeArchivist Agent...")
+    HTTP.Headers["Accept-Language"] = "en-us"  # type: ignore # noqa: F821
+    Log("Starting up TubeArchivist Agent...")  # type: ignore # noqa: F821
