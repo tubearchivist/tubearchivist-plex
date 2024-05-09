@@ -486,7 +486,7 @@ def get_ta_channel_metadata(chid):
         raise e
 
 
-def PullTASubtitles(vid_metadata, filepath, media_obj):
+def PullTASubtitles(vid_metadata, filepath, media_obj):  # noqa: C901
     lang_sub_map = {}
     lang_pub_map = []
     languages = {}
@@ -719,7 +719,7 @@ def Search(results, media, lang, manual):
     return 1
 
 
-def Update(metadata, media, lang, force):
+def Update(metadata, media, lang, force):  # noqa: C901
     _, guid, series_folder = metadata.id.split("|")
     channel_id = guid
     channel_title = ""
