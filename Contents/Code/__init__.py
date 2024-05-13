@@ -418,6 +418,9 @@ def get_ta_video_metadata(ytid):
             metadata["season"] = metadata["processed_date"].year
             metadata["episode"] = metadata["processed_date"].strftime("%Y%m%d")
             metadata["description"] = vid_response["data"]["description"]
+            metadata["runtime"] = vid_response["data"]["player"][
+                "duration_str"
+            ]
             metadata["thumb_url"] = vid_response["data"]["vid_thumb_url"]
             metadata["type"] = vid_response["data"]["vid_type"]
             metadata["has_subtitles"] = (
@@ -877,13 +880,15 @@ def Update(metadata, media, lang, force):  # noqa: C901
                 if TA_CONFIG["online"]:
                     vid_metadata = get_ta_video_metadata(episode_id)
                     episode.title = vid_metadata["title"]
-                    episode.summary = "YouTube ID: {}{}\n{}".format(
+                    episode.summary = "Runtime: {}\nYouTube ID: {}{}\nVideo Title: {}\n{}".format(  # noqa: E501
+                        vid_metadata["runtime"],
                         episode_id,
                         (
                             "\nVideo Type: {}".format(vid_metadata["type"])
                             if "video" not in vid_metadata["type"]
                             else ""
                         ),
+                        vid_metadata["title"],
                         vid_metadata["description"],
                     )
                     episode.originally_available_at = vid_metadata[
