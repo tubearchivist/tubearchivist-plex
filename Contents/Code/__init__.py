@@ -740,7 +740,9 @@ def Update(metadata, media, lang, force):  # noqa: C901
             channel_title = ch_metadata["show"]
         except AttributeError:
             Log.Critical(  # type: ignore # noqa: F821
-                f"Channel not found for item.\nGUID presented: {channel_id}\nMetadata Response: {ch_metadata}"  # noqa: E501
+                "Channel not found for item.\nGUID presented: {}\nMetadata Response: {}".format(  # noqa: E501
+                    channel_id, ch_metadata
+                )
             )
             return
     else:
