@@ -726,14 +726,20 @@ def Search(results, media, lang, manual):
 
 
 def Update(metadata, media, lang, force):  # noqa: C901
-    _, guid, series_folder = metadata.id.split("|")
+    _, guid, _ = metadata.id.split("|")  # Agent | GUID | Series Folder
     channel_id = guid
     channel_title = ""
     ch_metadata = {}
 
     if TA_CONFIG["online"]:
-        ch_metadata = get_ta_channel_metadata(channel_id)
-        channel_title = ch_metadata["show"]
+        try:
+            ch_metadata = get_ta_channel_metadata(channel_id)
+            channel_title = ch_metadata["show"]
+        except AttributeError:
+            Log.Critical(  # type: ignore # noqa: F821
+                f"Channel not found for item.\nGUID presented: {channel_id}\nMetadata Response: {ch_metadata}"  # noqa: E501
+            )
+            return
     else:
         channel_title = metadata.title
 
