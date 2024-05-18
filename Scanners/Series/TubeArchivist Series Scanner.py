@@ -289,7 +289,7 @@ def check_ta_version_in_response(response):
     try:
         if "version" in response:
             try:
-                if "v" in response["version"][0]:
+                if "v" in response["version"]:
                     ta_version = [
                         [
                             int(x)
