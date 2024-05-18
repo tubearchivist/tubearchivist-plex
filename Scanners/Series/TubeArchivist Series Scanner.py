@@ -291,12 +291,10 @@ def check_ta_version_in_response(response):
             try:
                 if "v" in response["version"]:
                     ta_version = [
-                        [
-                            int(x)
-                            for x in response["version"][1:]
-                            .rstrip("-unstable")
-                            .split(".")
-                        ]
+                        int(x)
+                        for x in response["version"][1:]
+                        .rstrip("-unstable")
+                        .split(".")
                     ]
                 else:
                     ta_version = [
