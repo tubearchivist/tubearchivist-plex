@@ -294,16 +294,16 @@ def check_ta_version_in_response(response):
                         [
                             int(x)
                             for x in response["version"][1:]
-                            .split(".")
                             .rstrip("-unstable")
+                            .split(".")
                         ]
                     ]
                 else:
                     ta_version = [
                         int(x)
                         for x in response["version"]
-                        .split(".")
                         .rstrip("-unstable")
+                        .split(".")
                     ]
             except (AttributeError, TypeError):
                 ta_version = response["version"]
