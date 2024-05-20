@@ -111,7 +111,15 @@ def read_url(url, data=None):
     except Exception as e:
         Log.error(
             "Error reading or accessing url '%s', Exception: '%s'"
-            % (url.get_full_url if type(url) is Request else url, e)
+            % (
+                (
+                    url.get_full_url()
+                    if (type(url) is Request)
+                    or (type(url) is urllib.request.Request)  # type: ignore # noqa: F821, E501
+                    else url
+                ),
+                e,
+            )
         )
         raise e
 
