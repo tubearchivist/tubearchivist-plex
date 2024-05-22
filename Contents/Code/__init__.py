@@ -864,15 +864,20 @@ def Update(metadata, media, lang, force):  # noqa: C901
 
         for s in sorted(media.seasons, key=natural_sort_key):
             for e in sorted(media.seasons[s].episodes, key=natural_sort_key):
+                Log.Debug(  # type: ignore # noqa: F821
+                    "Processing episode: {} - {}".format(
+                        channel_title, metadata.seasons[s].episodes[e]
+                    )
+                )
                 try:
                     episode = metadata.seasons[s].episodes[e]
-                except Exception as e:
-                    Log.Debug("Exception in for-s-for-e loop for each season/episode setting episode - seasons unhandled: {}".format(e))  # type: ignore # noqa: F821, E501
+                except Exception as ex:
+                    Log.Debug("Exception in for-s-for-e loop for each season/episode setting episode - seasons unhandled: {}".format(ex))  # type: ignore # noqa: F821, E501
                 episodes += 1
                 try:
                     episode_media = media.seasons[s].episodes[e]
-                except Exception as e:
-                    Log.Debug("Exception in for-s-for-e loop for each season/episode setting episode_media - seasons unhandled: {}".format(e))  # type: ignore # noqa: F821, E501
+                except Exception as ex:
+                    Log.Debug("Exception in for-s-for-e loop for each season/episode setting episode_media - seasons unhandled: {}".format(ex))  # type: ignore # noqa: F821, E501
                 episode_part = episode_media.items[0].parts[0]
                 filename = os.path.basename(episode_part.file)
                 filepath = os.path.dirname(episode_part.file)
@@ -943,13 +948,13 @@ def Update(metadata, media, lang, force):  # noqa: C901
                             Log("[_] Thumbs: {}".format(thumb_vid))  # type: ignore # noqa: F821, E501
                         else:
                             Log("[ ] Thumbs: {}".format(thumb_vid))  # type: ignore # noqa: F821, E501
-                    except Exception as e:
+                    except Exception as ex:
                         Log.Warning(  # type: ignore # noqa: F821, E501
                             "Issue when handling thumbnails for {}. Issue: {}".format(  # noqa: E501
-                                episode_id, e
+                                episode_id, ex
                             )
                         )
-                        raise e
+                        raise ex
 
                     if vid_metadata["has_subtitles"]:
                         PullTASubtitles(vid_metadata, filepath, episode_media)
