@@ -861,6 +861,10 @@ def Update(metadata, media, lang, force):  # noqa: C901
         )
 
         episodes = 0
+        try:
+            sorted(media.seasons, key=natural_sort_key)
+        except Exception as ex:
+            Log.Debug("Exception testing sorted media.seasons - seasons unhandled: {}".format(ex))  # type: ignore # noqa: F821, E501
 
         for s in sorted(media.seasons, key=natural_sort_key):
             for e in sorted(media.seasons[s].episodes, key=natural_sort_key):
