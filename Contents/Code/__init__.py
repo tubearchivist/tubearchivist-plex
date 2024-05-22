@@ -170,15 +170,21 @@ def GetMediaDir(media, movie=False, file=False):
     if movie:
         return os.path.dirname(media.items[0].parts[0].file)
     else:
-        for s in media.seasons if media else []:  # TV_Show:
-            for e in media.seasons[s].episodes:
-                return (
-                    media.seasons[s].episodes[e].items[0].parts[0].file
-                    if file
-                    else os.path.dirname(
-                        media.seasons[s].episodes[e].items[0].parts[0].file
-                    )
-                )
+        if media:
+            if "seasons" in media:
+                for s in media.seasons if media else []:  # TV_Show:
+                    for e in media.seasons[s].episodes if s else []:
+                        return (
+                            media.seasons[s].episodes[e].items[0].parts[0].file
+                            if file
+                            else os.path.dirname(
+                                media.seasons[s]
+                                .episodes[e]
+                                .items[0]
+                                .parts[0]
+                                .file
+                            )
+                        )
 
 
 def read_url(url, data=None):
