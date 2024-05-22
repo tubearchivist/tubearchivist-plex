@@ -16,9 +16,7 @@ import urllib2
 # from lxml import etree
 
 try:
-    from ssl import (
-        PROTOCOL_TLS as SSL_PROTOCOL,
-    )  # Python >= 2.7.13 #ssl.PROTOCOL_TLSv1
+    from ssl import PROTOCOL_TLS as SSL_PROTOCOL
 except ImportError:
     from ssl import PROTOCOL_SSLv23 as SSL_PROTOCOL  # Python <  2.7.13
 try:
@@ -170,21 +168,18 @@ def GetMediaDir(media, movie=False, file=False):
     if movie:
         return os.path.dirname(media.items[0].parts[0].file)
     else:
-        if media:
-            if "seasons" in media:
-                for s in media.seasons if media else []:  # TV_Show:
-                    for e in media.seasons[s].episodes if s else []:
-                        return (
+        try:
+            for s in media.seasons if media else []:  # TV_Show:
+                for e in media.seasons[s].episodes:
+                    return (
+                        media.seasons[s].episodes[e].items[0].parts[0].file
+                        if file
+                        else os.path.dirname(
                             media.seasons[s].episodes[e].items[0].parts[0].file
-                            if file
-                            else os.path.dirname(
-                                media.seasons[s]
-                                .episodes[e]
-                                .items[0]
-                                .parts[0]
-                                .file
-                            )
                         )
+                    )
+        except Exception as e:
+            Log.Debug("Exception in GetMediaDir - seasons unhandled: {}".format(e))  # type: ignore # noqa: F821, E501
 
 
 def read_url(url, data=None):
@@ -869,9 +864,15 @@ def Update(metadata, media, lang, force):  # noqa: C901
 
         for s in sorted(media.seasons, key=natural_sort_key):
             for e in sorted(media.seasons[s].episodes, key=natural_sort_key):
-                episode = metadata.seasons[s].episodes[e]
+                try:
+                    episode = metadata.seasons[s].episodes[e]
+                except Exception as e:
+                    Log.Debug("Exception in for-s-for-e loop for each season/episode setting episode - seasons unhandled: {}".format(e))  # type: ignore # noqa: F821, E501
                 episodes += 1
-                episode_media = media.seasons[s].episodes[e]
+                try:
+                    episode_media = media.seasons[s].episodes[e]
+                except Exception as e:
+                    Log.Debug("Exception in for-s-for-e loop for each season/episode setting episode_media - seasons unhandled: {}".format(e))  # type: ignore # noqa: F821, E501
                 episode_part = episode_media.items[0].parts[0]
                 filename = os.path.basename(episode_part.file)
                 filepath = os.path.dirname(episode_part.file)
