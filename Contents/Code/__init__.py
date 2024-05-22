@@ -905,35 +905,44 @@ def Update(metadata, media, lang, force):  # noqa: C901
                         "processed_date"
                     ].date()
 
-                    thumb_vid = "{}_{}".format(
-                        vid_metadata["refresh_date"], vid_metadata["thumb_url"]
-                    )
-                    if thumb_vid and thumb_vid not in episode.thumbs:
-                        episode.thumbs[thumb_vid] = Proxy.Media(  # type: ignore # noqa: F821, E501
-                            read_url(
-                                Request(
-                                    "{}{}".format(
-                                        TA_CONFIG["ta_url"],
-                                        vid_metadata["thumb_url"],
-                                    ),
-                                    headers={
-                                        "Authorization": "Token {}".format(
-                                            TA_CONFIG["ta_api_key"]
-                                        )
-                                    },
-                                )
-                            ),
-                            sort_order=(
-                                1
-                                if Prefs["media_poster_source"] == "Channel"  # type: ignore # noqa: F821, E501
-                                else 2
-                            ),
+                    try:
+                        thumb_vid = "{}_{}".format(
+                            vid_metadata["refresh_date"],
+                            vid_metadata["thumb_url"],
                         )
-                        Log("[X] Thumbs: {}".format(thumb_vid))  # type: ignore # noqa: F821, E501
-                    elif thumb_vid and thumb_vid in episode.thumbs:
-                        Log("[_] Thumbs: {}".format(thumb_vid))  # type: ignore # noqa: F821, E501
-                    else:
-                        Log("[ ] Thumbs: {}".format(thumb_vid))  # type: ignore # noqa: F821, E501
+                        if thumb_vid and thumb_vid not in episode.thumbs:
+                            episode.thumbs[thumb_vid] = Proxy.Media(  # type: ignore # noqa: F821, E501
+                                read_url(
+                                    Request(
+                                        "{}{}".format(
+                                            TA_CONFIG["ta_url"],
+                                            vid_metadata["thumb_url"],
+                                        ),
+                                        headers={
+                                            "Authorization": "Token {}".format(
+                                                TA_CONFIG["ta_api_key"]
+                                            )
+                                        },
+                                    )
+                                ),
+                                sort_order=(
+                                    1
+                                    if Prefs["media_poster_source"] == "Channel"  # type: ignore # noqa: F821, E501
+                                    else 2
+                                ),
+                            )
+                            Log("[X] Thumbs: {}".format(thumb_vid))  # type: ignore # noqa: F821, E501
+                        elif thumb_vid and thumb_vid in episode.thumbs:
+                            Log("[_] Thumbs: {}".format(thumb_vid))  # type: ignore # noqa: F821, E501
+                        else:
+                            Log("[ ] Thumbs: {}".format(thumb_vid))  # type: ignore # noqa: F821, E501
+                    except Exception as e:
+                        Log.Warning(  # type: ignore # noqa: F821, E501
+                            "Issue when handling thumbnails for {}. Issue: {}".format(  # noqa: E501
+                                episode_id, e
+                            )
+                        )
+                        raise e
 
                     if vid_metadata["has_subtitles"]:
                         PullTASubtitles(vid_metadata, filepath, episode_media)
