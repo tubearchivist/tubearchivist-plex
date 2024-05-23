@@ -861,118 +861,117 @@ def Update(metadata, media, lang, force):  # noqa: C901
         )
 
         episodes = 0
+
         try:
-            sorted(media.seasons, key=natural_sort_key)
-        except Exception as ex:
-            Log.Debug("Exception testing sorted media.seasons - seasons unhandled: {}".format(ex))  # type: ignore # noqa: F821, E501
-
-        for s in sorted(media.seasons, key=natural_sort_key):
-            for e in sorted(media.seasons[s].episodes, key=natural_sort_key):
-                Log.Debug(  # type: ignore # noqa: F821
-                    "Processing episode: {} - {}".format(
-                        channel_title, metadata.seasons[s].episodes[e]
-                    )
-                )
-                try:
+            for s in sorted(media.seasons, key=natural_sort_key):
+                for e in sorted(
+                    media.seasons[s].episodes, key=natural_sort_key
+                ):
                     episode = metadata.seasons[s].episodes[e]
-                except Exception as ex:
-                    Log.Debug("Exception in for-s-for-e loop for each season/episode setting episode - seasons unhandled: {}".format(ex))  # type: ignore # noqa: F821, E501
-                episodes += 1
-                try:
+                    episodes += 1
                     episode_media = media.seasons[s].episodes[e]
-                except Exception as ex:
-                    Log.Debug("Exception in for-s-for-e loop for each season/episode setting episode_media - seasons unhandled: {}".format(ex))  # type: ignore # noqa: F821, E501
-                episode_part = episode_media.items[0].parts[0]
-                filename = os.path.basename(episode_part.file)
-                filepath = os.path.dirname(episode_part.file)
-                filename_noext, filename_ext = os.path.splitext(filename)
-                episode_id = ""
-                if TA_CONFIG["version"] == [] or TA_CONFIG["version"] == [
-                    0,
-                    0,
-                    0,
-                ]:
-                    Log.Error(  # type: ignore # noqa: F821
-                        "TubeArchivist instance version is unknown or unset. Please review the logs further and ensure that there is connectivity between Plex and TubeArchivist."  # noqa: E501
-                    )
-                    break
-                if TA_CONFIG["version"] > [0, 3, 6] and TA_CONFIG["online"]:
-                    episode_id = filename_noext
-                elif TA_CONFIG[
-                    "online"
-                ]:  # Assume that if it is online and less that v0.4.0, it is compatible with the legacy file name schema  # noqa: E501
-                    episode_id = filename[9:20]
-
-                if TA_CONFIG["online"]:
-                    vid_metadata = get_ta_video_metadata(episode_id)
-                    episode.title = vid_metadata["title"]
-                    episode.summary = "Runtime: {}\nYouTube ID: {}{}\nVideo Title: {}\n{}".format(  # noqa: E501
-                        vid_metadata["runtime"],
-                        episode_id,
-                        (
-                            "\nVideo Type: {}".format(vid_metadata["type"])
-                            if "video" not in vid_metadata["type"]
-                            else ""
-                        ),
-                        vid_metadata["title"],
-                        vid_metadata["description"],
-                    )
-                    episode.originally_available_at = vid_metadata[
-                        "processed_date"
-                    ].date()
-
-                    try:
-                        thumb_vid = "{}_{}".format(
-                            vid_metadata["refresh_date"],
-                            vid_metadata["thumb_url"],
+                    episode_part = episode_media.items[0].parts[0]
+                    filename = os.path.basename(episode_part.file)
+                    filepath = os.path.dirname(episode_part.file)
+                    filename_noext, filename_ext = os.path.splitext(filename)
+                    episode_id = ""
+                    if TA_CONFIG["version"] == [] or TA_CONFIG["version"] == [
+                        0,
+                        0,
+                        0,
+                    ]:
+                        Log.Error(  # type: ignore # noqa: F821
+                            "TubeArchivist instance version is unknown or unset. Please review the logs further and ensure that there is connectivity between Plex and TubeArchivist."  # noqa: E501
                         )
-                        if thumb_vid and thumb_vid not in episode.thumbs:
-                            episode.thumbs[thumb_vid] = Proxy.Media(  # type: ignore # noqa: F821, E501
-                                read_url(
-                                    Request(
-                                        "{}{}".format(
-                                            TA_CONFIG["ta_url"],
-                                            vid_metadata["thumb_url"],
-                                        ),
-                                        headers={
-                                            "Authorization": "Token {}".format(
-                                                TA_CONFIG["ta_api_key"]
-                                            )
-                                        },
-                                    )
-                                ),
-                                sort_order=(
-                                    1
-                                    if Prefs["media_poster_source"] == "Channel"  # type: ignore # noqa: F821, E501
-                                    else 2
-                                ),
+                        break
+                    if (
+                        TA_CONFIG["version"] > [0, 3, 6]
+                        and TA_CONFIG["online"]
+                    ):
+                        episode_id = filename_noext
+                    elif TA_CONFIG[
+                        "online"
+                    ]:  # Assume that if it is online and less that v0.4.0, it is compatible with the legacy file name schema  # noqa: E501
+                        episode_id = filename[9:20]
+
+                    if TA_CONFIG["online"]:
+                        vid_metadata = get_ta_video_metadata(episode_id)
+                        episode.title = vid_metadata["title"]
+                        episode.summary = "Runtime: {}\nYouTube ID: {}{}\nVideo Title: {}\n{}".format(  # noqa: E501
+                            vid_metadata["runtime"],
+                            episode_id,
+                            (
+                                "\nVideo Type: {}".format(vid_metadata["type"])
+                                if "video" not in vid_metadata["type"]
+                                else ""
+                            ),
+                            vid_metadata["title"],
+                            vid_metadata["description"],
+                        )
+                        episode.originally_available_at = vid_metadata[
+                            "processed_date"
+                        ].date()
+
+                        try:
+                            thumb_vid = "{}_{}".format(
+                                vid_metadata["refresh_date"],
+                                vid_metadata["thumb_url"],
                             )
-                            Log("[X] Thumbs: {}".format(thumb_vid))  # type: ignore # noqa: F821, E501
-                        elif thumb_vid and thumb_vid in episode.thumbs:
-                            Log("[_] Thumbs: {}".format(thumb_vid))  # type: ignore # noqa: F821, E501
+                            if thumb_vid and thumb_vid not in episode.thumbs:
+                                episode.thumbs[thumb_vid] = Proxy.Media(  # type: ignore # noqa: F821, E501
+                                    read_url(
+                                        Request(
+                                            "{}{}".format(
+                                                TA_CONFIG["ta_url"],
+                                                vid_metadata["thumb_url"],
+                                            ),
+                                            headers={
+                                                "Authorization": "Token {}".format(
+                                                    TA_CONFIG["ta_api_key"]
+                                                )
+                                            },
+                                        )
+                                    ),
+                                    sort_order=(
+                                        1
+                                        if Prefs["media_poster_source"] == "Channel"  # type: ignore # noqa: F821, E501
+                                        else 2
+                                    ),
+                                )
+                                Log("[X] Thumbs: {}".format(thumb_vid))  # type: ignore # noqa: F821, E501
+                            elif thumb_vid and thumb_vid in episode.thumbs:
+                                Log("[_] Thumbs: {}".format(thumb_vid))  # type: ignore # noqa: F821, E501
+                            else:
+                                Log("[ ] Thumbs: {}".format(thumb_vid))  # type: ignore # noqa: F821, E501
+                        except Exception as ex:
+                            Log.Warning(  # type: ignore # noqa: F821, E501
+                                "Issue when handling thumbnails for {}. Issue: {}".format(  # noqa: E501
+                                    episode_id, ex
+                                )
+                            )
+                            raise ex
+
+                        if vid_metadata["has_subtitles"]:
+                            PullTASubtitles(
+                                vid_metadata, filepath, episode_media
+                            )
                         else:
-                            Log("[ ] Thumbs: {}".format(thumb_vid))  # type: ignore # noqa: F821, E501
-                    except Exception as ex:
-                        Log.Warning(  # type: ignore # noqa: F821, E501
-                            "Issue when handling thumbnails for {}. Issue: {}".format(  # noqa: E501
-                                episode_id, ex
+                            Log.Info(  # type: ignore # noqa: F821
+                                "No downloaded subtitles associated with video ID {}. No request made to TubeArchivist.".format(  # noqa: E501
+                                    episode_id
+                                )
                             )
-                        )
-                        raise ex
-
-                    if vid_metadata["has_subtitles"]:
-                        PullTASubtitles(vid_metadata, filepath, episode_media)
-                    else:
                         Log.Info(  # type: ignore # noqa: F821
-                            "No downloaded subtitles associated with video ID {}. No request made to TubeArchivist.".format(  # noqa: E501
-                                episode_id
+                            "Episode '{} - {}' for channel {} processed successfully.".format(  # noqa: E501
+                                episode_id, episode.title, channel_title
                             )
                         )
-                    Log.Info(  # type: ignore # noqa: F821
-                        "Episode '{} - {}' for channel {} processed successfully.".format(  # noqa: E501
-                            episode_id, episode.title, channel_title
-                        )
-                    )
+        except AttributeError as ex:
+            Log.Critical(  # type: ignore # noqa: F821
+                "Issue in processing media object. Missing object attribute. Full error: {}".format(  # noqa: E501
+                    ex
+                )
+            )
         Log.Info(  # type: ignore # noqa: F821
             "All episode files processed for {}. Count: {}".format(
                 channel_title, str(episodes)
