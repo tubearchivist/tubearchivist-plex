@@ -111,7 +111,15 @@ def read_url(url, data=None):
     except Exception as e:
         Log.error(
             "Error reading or accessing url '%s', Exception: '%s'"
-            % (url.get_full_url if type(url) is Request else url, e)
+            % (
+                (
+                    url.get_full_url()
+                    if (type(url) is Request)
+                    or (type(url) is urllib.request.Request)  # type: ignore # noqa: F821, E501
+                    else url
+                ),
+                e,
+            )
         )
         raise e
 
@@ -289,21 +297,19 @@ def check_ta_version_in_response(response):
     try:
         if "version" in response:
             try:
-                if "v" in response["version"][0]:
+                if "v" in response["version"]:
                     ta_version = [
-                        [
-                            int(x)
-                            for x in response["version"][1:]
-                            .split(".")
-                            .rstrip("-unstable")
-                        ]
+                        int(x)
+                        for x in response["version"][1:]
+                        .rstrip("-unstable")
+                        .split(".")
                     ]
                 else:
                     ta_version = [
                         int(x)
                         for x in response["version"]
-                        .split(".")
                         .rstrip("-unstable")
+                        .split(".")
                     ]
             except (AttributeError, TypeError):
                 ta_version = response["version"]
