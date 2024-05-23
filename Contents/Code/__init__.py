@@ -739,6 +739,10 @@ def Search(results, media, lang, manual):
 
 def Update(metadata, media, lang, force):  # noqa: C901
     _, guid, _ = metadata.id.split("|")  # Agent | GUID | Series Folder
+    if not media:
+        Log.Debug(  # type: ignore # noqa: F821
+            "Issue found with Plex while generating media object. Media object not present for agent handling. Agent will only update the channel metadata."  # noqa: E501
+        )
     channel_id = guid
     channel_title = ""
     ch_metadata = {}
