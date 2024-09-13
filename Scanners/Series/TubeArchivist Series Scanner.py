@@ -29,9 +29,11 @@ try:
 except ImportError:
     from ssl import PROTOCOL_SSLv23 as SSL_PROTOCOL  # Python <  2.7.13
 try:
-    from urllib.request import Request, urlopen  # Python >= 3.0
+    from urllib.request import Request as Request  # Python >= 3.0
+    from urllib.request import urlopen
 except ImportError:
-    from urllib2 import Request, urlopen  # Python == 2.x
+    from urllib2 import Request as Request  # Python == 2.x
+    from urllib2 import urlopen
 
 SetupDone = False
 Log = None
@@ -114,8 +116,9 @@ def read_url(url, data=None):
             % (
                 (
                     url.get_full_url()
-                    if (type(url) is Request)
-                    or (type(url) is urllib.request.Request)  # type: ignore # noqa: F821, E501
+                    if any(
+                        x in str(type(url)) for x in ["Request", "instance"]
+                    )
                     else url
                 ),
                 e,
