@@ -47,7 +47,7 @@ A list of potential default installation locations:
 
 ## First time setup preparations
 1. Pull the [API Key](https://docs.tubearchivist.com/settings/application/#integrations) for TubeArchivist and have it ready for the configuration files.
-2. Ensure that Plex can see the Media directory that you will use to store the videos.
+2. Ensure that Plex can see the TubeArchivist Media directory that you use to store the downloaded videos.
 3. Ensure that the system running Plex can communicate to TubeArchivist.
 
 ## Download `.zip` File
@@ -75,13 +75,14 @@ A list of potential default installation locations:
 1. After the Scanner and Agent have been installed, create a new (or update an existing) library.
 2. Choose the `Manage Library` -> `Edit...` option.
 3. On the `General` tab, select the `TV Shows` option.
-4. On the `Advanced` tab, select or update the following mandatory options:
+4. On the `Add Folders` tab, select the TubeArchivist Media location that contains all of the channel folders (the parent folder).
+5. On the `Advanced` tab, select or update the following mandatory options:
     * Scanner: `TubeArchivist Scanner`
     * Agent: `TubeArchivist Agent`
     * TubeArchivist API Key: Insert the API Key (this is the same that is used for the Scanner config file)
     * TubeArchivist URL: The URL that Plex can access your TubeArchivist instance
-5. The Scanner should immediately start finding new videos and update as it sees them, but you can also run a `Scan Library Files` for the Library to initiate a check.
-6. The Agent should update the metadata after finding the new videos, but you can also run a `Refresh Metadata` on the Library, Channel, or individual video to initiate an update.
+6. The Scanner should immediately start finding new videos and update as it sees them, but you can also run a `Scan Library Files` for the Library to initiate a check.
+7. The Agent should update the metadata after finding the new videos, but you can also run a `Refresh Metadata` on the Library, Channel, or individual video to initiate an update.
 
 # Troubleshooting
 If you are having problems with seeing the Scanner or Agent, confirm that the instructions are followed.
