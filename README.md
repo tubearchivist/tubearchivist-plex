@@ -68,7 +68,7 @@ A list of potential default installation locations:
 ## Agent Installation
 1. If there is still a `Scanners` folder in the `TubeArchivist-Agent.bundle` directory, go ahead and move/remove it.
 2. Move the `TubeArchivist-Agent.bundle` directory into the `Plex Media Server\Plug-ins` directory.
-3. Change the ownership and permissions of the directory and all subdirectories/files to allow access to teh Plex user that is appropriate for your system. This should match the other Agent bundles that are already in the `Plex Media Server\Plug-ins` directory.
+3. Change the ownership and permissions of the directory and all subdirectories/files to allow access to the Plex user that is appropriate for your system. This should match the other Agent bundles that are already in the `Plex Media Server\Plug-ins` directory.
 4. Restart the Plex Media Server service as is appropriate for your system.
 
 ## Library Integration
@@ -97,4 +97,4 @@ Agent Log Location: `Plex Media Server/Logs/PMS Plugin Logs/com.plexapp.agents.t
 If you are still having an issue, either open an Issue in GitHub or a Support Case on the Discord, specifying that it is related to the Plex integration.
 
 # Special Thanks and Reference
-This project is heavily influenced by the works of ZeroQI, JordyAlkema, and BeefTornado, as well as the Plex Media Server's official scanners and agents. 
+This project is heavily influenced by the works of ZeroQI, JordyAlkema, and BeefTornado, as well as the Plex Media Server's official scanners and agents.
