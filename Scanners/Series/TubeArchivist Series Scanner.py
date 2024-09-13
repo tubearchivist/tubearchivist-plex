@@ -114,7 +114,7 @@ def read_url(url, data=None):
         Log.error(
             "Error reading or accessing url '%s', Exception: '%s'"
             % (
-                (url.get_full_url() if ("Request" in type(url)) else url),
+                (url.get_full_url() if ("Request" in str(type(url))) else url),
                 e,
             )
         )
