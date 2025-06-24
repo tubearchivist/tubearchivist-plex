@@ -46,7 +46,7 @@ A list of potential default installation locations:
     * '/raid0/data/PLEX_CONFIG/Plex Media Server/'                               # Thecus Plex community
 
 ## First time setup preparations
-1. Pull the [API Key](https://docs.tubearchivist.com/api/introduction/#authentication)) for TubeArchivist and have it ready for the configuration files.
+1. Pull the [API Key](https://docs.tubearchivist.com/api/introduction/#authentication) for TubeArchivist and have it ready for the configuration files.
 2. Ensure that Plex can see the TubeArchivist Media directory that you use to store the downloaded videos.
 3. Ensure that the system running Plex can communicate to TubeArchivist.
 4. If using a non-standard port (HTTP uses 80, HTTPS uses 443), including the TubeArchivist default port of 8000, that must be included with the `TA_URL` configurations.
@@ -84,6 +84,24 @@ A list of potential default installation locations:
     * TubeArchivist URL: The URL that Plex can access your TubeArchivist instance. Note: If using a non-standard port (HTTP uses 80, HTTPS uses 443), including the TubeArchivist default port of 8000, that must be included with the `TA_URL` configurations.
 6. The Scanner should immediately start finding new videos and update as it sees them, but you can also run a `Scan Library Files` for the Library to initiate a check.
 7. The Agent should update the metadata after finding the new videos, but you can also run a `Refresh Metadata` on the Library, Channel, or individual video to initiate an update.
+
+## Notify Plex of New Videos
+You can use TubeArchivist's notification system to have Plex rescan your library when new videos are downloaded. To do this you will need a Plex token and your library ID.
+
+Article: [Finding an authentication token](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/)
+
+Article: [Plex Media Server URL Commands](https://support.plex.tv/articles/201638786-plex-media-server-url-commands). Scroll to the section titled "Listing Defined Libraries" to find your library ID.
+
+1. On the `Scheduling` tab of the TubeArchivist settings page, scroll down to `Add Notification URL`
+2. From the `--select task--` drop down, choose `Downloading`
+3. In the `Apprise notification URL` field, put `jsons://my-plex-url/library/sections/my-library-id/refresh?+X-Plex-Token=my-plex-token&method=GET`
+    * Replace `my-plex-url` with your Plex instance
+    * Replace `my-library-id` with your library ID
+    * Replace `my-plex-token` with your X-Plex-Token
+    * If your Plex instance uses a self signed certificate, append `&verify=false` to the end
+    * If your Plex instance is not protected by TLS, replace `jsons` with `json`
+
+    Note that the `X-Plex-Token` query parameter is preceeded with a `+`. That instructs Apprise to pass along that query parameter to Plex.
 
 # Troubleshooting
 If you are having problems with seeing the Scanner or Agent, confirm that the instructions are followed.
