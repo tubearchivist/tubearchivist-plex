@@ -360,9 +360,7 @@ def check_ta_version_in_response(response):
                 # This handles cases where response["version"] is not a string 
                 # (e.g., if it's already a list or a number)
                 ta_version = response["version"]
-            
-            # The Log.Info section remains the same
-            Log.Info(  # type: ignore # noqa: F821
+            Log.info(
                 "TubeArchivist is running version v{}".format(
                     ".".join(str(x) for x in ta_version)
                 )
