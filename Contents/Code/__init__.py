@@ -380,23 +380,29 @@ def check_ta_version_in_response(response):
     try:
         if "version" in response:
             try:
-                if "v" in response["version"]:
+                version_string = response["version"]
+                
+                # Split the string at the first hyphen and take the first part
+                # This removes '-unstable', '-beta', '-rc1', or any other suffix
+                cleaned_version_string = version_string.split('-', 1)[0]
+
+                if cleaned_version_string.startswith("v"):
                     ta_version = [
                         int(x)
-                        for x in response["version"][1:]
-                        .rstrip("-unstable")
+                        for x in cleaned_version_string[1:]
                         .split(".")
                     ]
                 else:
                     ta_version = [
                         int(x)
-                        for x in response["version"]
-                        .rstrip("-unstable")
+                        for x in cleaned_version_string
                         .split(".")
                     ]
             except (AttributeError, TypeError):
+                # This handles cases where response["version"] is not a string 
+                # (e.g., if it's already a list or a number)
                 ta_version = response["version"]
-            Log.Info(  # type: ignore # noqa: F821
+            Log.info(
                 "TubeArchivist is running version v{}".format(
                     ".".join(str(x) for x in ta_version)
                 )
