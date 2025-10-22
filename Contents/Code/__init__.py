@@ -580,7 +580,15 @@ def PullTASubtitles(vid_metadata, filepath, media_obj):  # noqa: C901
         if ext in [".vtt"]:
             codec = "vtt"
             format = None
-            lang_match = Locale.Language.Match(sub["lang"])  # type: ignore # noqa: F821, E501
+
+            # Parse language code - extract base language from locale
+            # (e.g., "en" from "en-US")
+            lang_code = sub["lang"]
+            if "-" in lang_code:
+                base_lang = lang_code.split("-")[0]
+                lang_code = base_lang
+
+            lang_match = Locale.Language.Match(lang_code)  # type: ignore # noqa: F821, E501
 
             if os.path.exists(filepath):
                 filename = os.path.basename(sub["media_url"])
