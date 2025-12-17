@@ -93,9 +93,9 @@ The scanner now supports organizing videos by TubeArchivist playlists in additio
 
 The scanner uses a subscription-aware organization system:
 
-1. **Playlist Priority**: If a video belongs to one or more **subscribed playlists** in TubeArchivist, it will appear under those playlist shows in Plex
-2. **Channel Fallback**: If a video is not in any subscribed playlists, it will appear under its channel show (if the channel is subscribed)
-3. **Multi-Playlist Support**: Videos can appear in multiple playlist shows if they belong to multiple subscribed playlists
+1. **Playlist Shows**: Videos that belong to **subscribed playlists** in TubeArchivist will appear under those playlist shows in Plex
+2. **Channel Shows**: Videos from **subscribed channels** in TubeArchivist will appear under their channel show
+3. **Duplicate Entries**: Videos can appear in multiple shows if they belong to multiple subscribed playlists and/or a subscribed channel
 4. **Filtering**: Videos are only shown if they belong to a subscribed playlist OR subscribed channel
 
 ## Setup Requirements
@@ -109,7 +109,9 @@ The scanner uses a subscription-aware organization system:
 
 - Video in subscribed playlist "Best of 2024" → Appears under "Best of 2024" playlist show
 - Video in subscribed channel "Tech Channel" (no playlists) → Appears under "Tech Channel" channel show
+- Video in subscribed playlist + subscribed channel → Appears in BOTH the playlist show and channel show
 - Video in 2 subscribed playlists → Appears in both playlist shows
+- Video in 2 subscribed playlists + subscribed channel → Appears in all 3 shows
 - Video in non-subscribed playlist, non-subscribed channel → Not shown in Plex
 
 ## Notes

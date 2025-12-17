@@ -765,35 +765,35 @@ def Scan(path, files, mediaList, subdirs):  # noqa: C901
                                             )
                                         )
 
-                                # If no subscribed playlists, fall back to channel
-                                if not shows_to_create:
-                                    channel_id = video_metadata.get("channel_id")
-                                    if channel_id:
-                                        try:
-                                            ch_metadata = get_ta_channel_metadata(channel_id)  # noqa: E501
-                                            if ch_metadata and ch_metadata.get("channel_subscribed"):  # noqa: E501
-                                                shows_to_create.append({
-                                                    "type": "channel",
-                                                    "show": video_metadata["show"],
-                                                    "metadata": ch_metadata
-                                                })
-                                                Log.info(
-                                                    "Video from subscribed channel: {}".format(  # noqa: E501
-                                                        video_metadata["channel_name"]
-                                                    )
-                                                )
-                                            else:
-                                                Log.info(
-                                                    "Video channel not subscribed, skipping: {}".format(  # noqa: E501
-                                                        video_metadata["channel_name"]
-                                                    )
-                                                )
-                                        except Exception as e:
-                                            Log.error(
-                                                "Error fetching channel metadata for {}: {}".format(  # noqa: E501
-                                                    channel_id, e
+                                # Also check if channel is subscribed (can appear in both playlist and channel)
+                                channel_id = video_metadata.get("channel_id")
+                                if channel_id:
+                                    try:
+                                        ch_metadata = get_ta_channel_metadata(channel_id)  # noqa: E501
+                                        if ch_metadata and ch_metadata.get("channel_subscribed"):  # noqa: E501
+                                            shows_to_create.append({
+                                                "type": "channel",
+                                                "show": video_metadata["show"],
+                                                "metadata": ch_metadata
+                                            })
+                                            Log.info(
+                                                "Video from subscribed channel: {}".format(  # noqa: E501
+                                                    video_metadata["channel_name"]
                                                 )
                                             )
+                                        elif not shows_to_create:
+                                            # Only log skip if not in any subscribed playlists
+                                            Log.info(
+                                                "Video channel not subscribed, skipping: {}".format(  # noqa: E501
+                                                    video_metadata["channel_name"]
+                                                )
+                                            )
+                                    except Exception as e:
+                                        Log.error(
+                                            "Error fetching channel metadata for {}: {}".format(  # noqa: E501
+                                                channel_id, e
+                                            )
+                                        )
 
                                 # Skip video if no subscribed playlists or channels
                                 if not shows_to_create:
