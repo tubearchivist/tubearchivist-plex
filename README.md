@@ -18,6 +18,50 @@ Playlist integration is an expected roadmap item but is not currently available.
 Not all metadata that Plex can show is being provided at this time and will be incorporate with future releases.
 
 # Installation Steps
+
+## Automated Installation (Recommended)
+
+The easiest way to install or update the TubeArchivist Plex integration is using the automated installer script:
+
+```bash
+# Interactive installation
+curl -sSL https://raw.githubusercontent.com/tubearchivist/tubearchivist-plex/main/install.sh | bash
+
+# Automated installation with environment variables
+PLEX_DIR="/var/lib/plexmediaserver/Library/Application Support/Plex Media Server" \
+TA_URL="http://tubearchivist:8000" \
+TA_API_KEY="your-api-key" \
+PLEX_USER="plex" \
+PLEX_GROUP="plex" \
+curl -sSL https://raw.githubusercontent.com/tubearchivist/tubearchivist-plex/main/install.sh | bash
+
+# Test installation (dry-run mode)
+DRY_RUN=1 \
+PLEX_DIR="/path/to/plex" \
+TA_API_KEY="test-key" \
+curl -sSL https://raw.githubusercontent.com/tubearchivist/tubearchivist-plex/main/install.sh | bash
+```
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PLEX_DIR` | Plex Media Server directory path | *Required* |
+| `TA_URL` | TubeArchivist URL (include port if not 80/443) | `http://localhost:8000` |
+| `TA_API_KEY` | TubeArchivist API Key | *Required for new installs* |
+| `PLEX_USER` | Plex service user for file ownership | Auto-detected |
+| `PLEX_GROUP` | Plex service group for file ownership | Auto-detected |
+| `DRY_RUN` | Set to `1` for validation only (no changes) | - |
+
+### Update Behavior
+
+- **Fresh Install**: Prompts for all required configuration
+- **Update**: Automatically uses existing configuration, only prompts for missing values
+- **Backup**: Existing config is backed up with timestamp before updates
+
+## Manual Installation
+
+For advanced users or custom setups, you can install manually:
 ## Plex Media Server Location
 The root `Plex Media Server` directory can be in different locations depending on how it is installed. All references for installation will be based on this location.
 
