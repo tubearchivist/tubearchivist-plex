@@ -42,7 +42,7 @@ CachePath = os.path.join(
     PLEX_ROOT,
     "Plug-in Support",
     "Data",
-    "com.plexapp.agents.tubearchivist-agent",
+    "com.plexapp.agents.tubearchivist_agent",
     "DataItems",
 )
 PLEX_LIBRARY = {}

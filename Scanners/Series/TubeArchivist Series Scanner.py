@@ -676,9 +676,10 @@ def Scan(path, files, mediaList, subdirs):  # noqa: C901
                         if episode not in episode_counts[show][season]:
                             episode_counts[show][season][episode] = 0
                         episode_counts[show][season][episode] += 1
+                        episode_date = episode  # Preserve YYYYMMDD
                         episode = "{}{:02d}".format(
-                            str(episode[2:]),
-                            episode_counts[show][season][episode],
+                            str(episode[4:]),
+                            episode_counts[show][season][episode_date],
                         )
 
                         tv_show = Media.Episode(
@@ -693,15 +694,11 @@ def Scan(path, files, mediaList, subdirs):  # noqa: C901
                                 episode, title, show, season
                             )
                         )
-                        episode_split = [
-                            str(episode[x : x + 2])  # noqa: E203
-                            for x in range(0, len(episode), 2)
-                        ]
                         tv_show.released_at = str(
                             "{}-{}-{}".format(
-                                episode_split[0],
-                                episode_split[1],
-                                episode_split[2],
+                                episode_date[2:4],
+                                episode_date[4:6],
+                                episode_date[6:8],
                             )
                         ).encode("UTF-8")
                         tv_show.parts.append(i)
