@@ -1,0 +1,40 @@
+---
+when:
+  event: tag
+
+steps:
+  - name: build-release
+    image: alpine:latest
+    commands:
+      - apk add --no-cache tar
+      - |
+        # Create release tarball with scanner and agent
+        mkdir -p release/Scanners/Series
+        mkdir -p release/Plug-ins
+        
+        cp -r Scanners/Series/* release/Scanners/Series/
+        cp -r . release/Plug-ins/TubeArchivist-Agent.bundle
+        
+        # Clean up git files from agent bundle
+        rm -rf release/Plug-ins/TubeArchivist-Agent.bundle/.git
+        rm -rf release/Plug-ins/TubeArchivist-Agent.bundle/.github
+        rm -f release/Plug-ins/TubeArchivist-Agent.bundle/.woodpecker.yml
+        
+        # Create tarball
+        cd release
+        tar -czf ../tubearchivist-plex-${CI_COMMIT_TAG}.tar.gz .
+        cd ..
+        
+        echo "Release artifact: tubearchivist-plex-${CI_COMMIT_TAG}.tar.gz"
+        ls -lh tubearchivist-plex-${CI_COMMIT_TAG}.tar.gz
+
+  - name: publish-release
+    image: plugins/gitea-release
+    settings:
+      api_key:
+        from_secret: gitea_token
+      base_url: https://git.silverhollow.xyz
+      files:
+        - "tubearchivist-plex-*.tar.gz"
+      title: "Release ${CI_COMMIT_TAG}"
+      note: "TubeArchivist Plex plugin release ${CI_COMMIT_TAG}"

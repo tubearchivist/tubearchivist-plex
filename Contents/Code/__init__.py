@@ -564,6 +564,57 @@ def get_ta_channel_metadata(chid):
         raise e
 
 
+def get_ta_playlist_metadata(plid):
+    mtype = "playlist"
+    if not TA_CONFIG:
+        Log.Error("No configurations in TA_CONFIG.")  # type: ignore # noqa: F821, E501
+        return {}
+    if not plid:
+        Log.Error("No {} ID present.".format(mtype))  # type: ignore # noqa: F821, E501
+        return {}
+    try:
+        pl_response = get_ta_metadata(plid, mtype="playlist")
+        Log.Info(  # type: ignore # noqa: F821
+            "Response from TubeArchivist received for YouTube {}: {}".format(
+                mtype, plid
+            )
+        )
+        if pl_response:
+            if TA_CONFIG["version"] < [0, 5, 0]:
+                pl_response = pl_response["data"]
+            metadata = {}
+            if Prefs["show_channel_id"]:  # type: ignore # noqa: F821
+                metadata["show"] = "{} [{}]".format(
+                    pl_response["playlist_name"],
+                    pl_response["playlist_id"],
+                )
+            else:
+                metadata["show"] = "{}".format(pl_response["playlist_name"])
+            playlist_refresh = Datetime.ParseDate(  # type: ignore # noqa: F821
+                pl_response["playlist_last_refresh"]
+            )
+            metadata["refresh_date"] = playlist_refresh.strftime("%Y%m%d")
+            metadata["description"] = "{}\n\nPlaylist ID: {}".format(
+                pl_response["playlist_description"],
+                pl_response["playlist_id"],
+            )
+            metadata["thumb_url"] = pl_response["playlist_thumbnail"]
+            metadata["playlist_channel"] = pl_response["playlist_channel"]
+            metadata["playlist_channel_id"] = pl_response["playlist_channel_id"]
+            return metadata
+        else:
+            Log.Error(  # type: ignore # noqa: F821
+                "Empty response returned from %s when requesting data about %s."  # noqa: E501
+                % (TA_CONFIG["ta_url"], mtype)
+            )
+    except Exception as e:
+        Log.Error(  # type: ignore # noqa: F821
+            "Error processing %s response from TubeArchivist at location '%s', Exception: '%s'"  # noqa: E501
+            % (mtype, TA_CONFIG["ta_url"], e)
+        )
+        raise e
+
+
 def PullTASubtitles(vid_metadata, filepath, media_obj):  # noqa: C901
     lang_sub_map = {}
     lang_pub_map = []
@@ -753,11 +804,17 @@ def Search(results, media, lang, manual):
                     displayname.rindex("]")
                 )  # noqa: E203
             ]
+            # For playlists, use consistent ID across all folders
+            # For channels, keep folder-specific ID
+            if guid.startswith("PL"):
+                show_id = "tubearchivist|{}|playlist".format(guid)
+            else:
+                show_id = "tubearchivist|{}|{}".format(
+                    guid, os.path.basename(dir)
+                )
             results.Append(
                 MetadataSearchResult(  # type: ignore # noqa: F821
-                    id="tubearchivist|{}|{}".format(
-                        guid, os.path.basename(dir)
-                    ),
+                    id=show_id,
                     name=displayname,
                     year=media.year,
                     score=100,
@@ -801,38 +858,46 @@ def Update(metadata, media, lang, force):  # noqa: C901
     _, guid, _ = metadata.id.split("|")  # Agent | GUID | Series Folder
     if not media:
         Log.Debug(  # type: ignore # noqa: F821
-            "Issue found with Plex while generating media object. Media object not present for agent handling. Agent will only update the channel metadata."  # noqa: E501
+            "Issue found with Plex while generating media object. Media object not present for agent handling. Agent will only update the show metadata."  # noqa: E501
         )
-    channel_id = guid
-    channel_title = ""
-    ch_metadata = {}
+
+    # Detect if GUID is a playlist or channel
+    is_playlist = guid.startswith("PL")
+    show_metadata = {}
+    show_title = ""
 
     if TA_CONFIG["online"]:
         try:
-            ch_metadata = get_ta_channel_metadata(channel_id)
-            channel_title = ch_metadata["show"]
+            if is_playlist:
+                Log.Info("Detected playlist GUID: {}".format(guid))  # type: ignore # noqa: F821, E501
+                show_metadata = get_ta_playlist_metadata(guid)
+                show_title = show_metadata["show"]
+            else:
+                Log.Info("Detected channel GUID: {}".format(guid))  # type: ignore # noqa: F821, E501
+                show_metadata = get_ta_channel_metadata(guid)
+                show_title = show_metadata["show"]
         except AttributeError:
             Log.Critical(  # type: ignore # noqa: F821
-                "Channel not found for item.\nGUID presented: {}\nMetadata Response: {}".format(  # noqa: E501
-                    channel_id, ch_metadata
+                "Show not found for item.\nGUID presented: {}\nMetadata Response: {}".format(  # noqa: E501
+                    guid, show_metadata
                 )
             )
             return 0
     else:
-        channel_title = metadata.title
+        show_title = metadata.title
 
-    metadata.title = channel_title
+    metadata.title = show_title
 
     if TA_CONFIG["online"]:
-        thumb_channel = "{}_{}".format(
-            ch_metadata["refresh_date"], ch_metadata["thumb_url"]
+        thumb_show = "{}_{}".format(
+            show_metadata["refresh_date"], show_metadata["thumb_url"]
         )
-        if thumb_channel and thumb_channel not in metadata.posters:
-            metadata.posters[thumb_channel] = Proxy.Media(  # type: ignore # noqa: F821, E501
+        if thumb_show and thumb_show not in metadata.posters:
+            metadata.posters[thumb_show] = Proxy.Media(  # type: ignore # noqa: F821, E501
                 read_url(
                     Request(
                         "{}{}".format(
-                            TA_CONFIG["ta_url"], ch_metadata["thumb_url"]
+                            TA_CONFIG["ta_url"], show_metadata["thumb_url"]
                         ),
                         headers={
                             "Authorization": "Token {}".format(
@@ -847,22 +912,24 @@ def Update(metadata, media, lang, force):  # noqa: C901
                     else 2
                 ),
             )
-            Log("[X] Posters: {}".format(thumb_channel))  # type: ignore # noqa: F821, E501
-        elif thumb_channel and thumb_channel in metadata.posters:
-            Log("[_] Posters: {}".format(thumb_channel))  # type: ignore # noqa: F821, E501
+            Log("[X] Posters: {}".format(thumb_show))  # type: ignore # noqa: F821, E501
+        elif thumb_show and thumb_show in metadata.posters:
+            Log("[_] Posters: {}".format(thumb_show))  # type: ignore # noqa: F821, E501
         else:
-            Log("[ ] Posters: {}".format(thumb_channel))  # type: ignore # noqa: F821, E501
+            Log("[ ] Posters: {}".format(thumb_show))  # type: ignore # noqa: F821, E501
 
-        tvart_channel = "{}_{}".format(
-            ch_metadata["refresh_date"], ch_metadata["tvart_url"]
-        )
-        if tvart_channel and tvart_channel not in metadata.art:
-            metadata.art[tvart_channel] = Proxy.Media(  # type: ignore # noqa: F821, E501
-                read_url(
-                    Request(
-                        "{}{}".format(
-                            TA_CONFIG["ta_url"], ch_metadata["tvart_url"]
-                        ),
+        # Handle tvart (only for channels, playlists don't have this)
+        if not is_playlist and "tvart_url" in show_metadata:
+            tvart_show = "{}_{}".format(
+                show_metadata["refresh_date"], show_metadata["tvart_url"]
+            )
+            if tvart_show and tvart_show not in metadata.art:
+                metadata.art[tvart_show] = Proxy.Media(  # type: ignore # noqa: F821, E501
+                    read_url(
+                        Request(
+                            "{}{}".format(
+                                TA_CONFIG["ta_url"], show_metadata["tvart_url"]
+                            ),
                         headers={
                             "Authorization": "Token {}".format(
                                 TA_CONFIG["ta_api_key"]
@@ -876,22 +943,24 @@ def Update(metadata, media, lang, force):  # noqa: C901
                     else 2
                 ),
             )
-            Log("[X] Art: {}".format(tvart_channel))  # type: ignore # noqa: F821, E501
-        elif tvart_channel and tvart_channel in metadata.art:
-            Log("[_] Art: {}".format(tvart_channel))  # type: ignore # noqa: F821, E501
-        else:
-            Log("[ ] Art: {}".format(tvart_channel))  # type: ignore # noqa: F821, E501
+                Log("[X] Art: {}".format(tvart_show))  # type: ignore # noqa: F821, E501
+            elif tvart_show and tvart_show in metadata.art:
+                Log("[_] Art: {}".format(tvart_show))  # type: ignore # noqa: F821, E501
+            else:
+                Log("[ ] Art: {}".format(tvart_show))  # type: ignore # noqa: F821, E501
 
-        banner_channel = "{}_{}".format(
-            ch_metadata["refresh_date"], ch_metadata["banner_url"]
-        )
-        if banner_channel and banner_channel not in metadata.banners:
-            metadata.banners[banner_channel] = Proxy.Media(  # type: ignore # noqa: F821, E501
-                read_url(
-                    Request(
-                        "{}{}".format(
-                            TA_CONFIG["ta_url"], ch_metadata["banner_url"]
-                        ),
+        # Handle banner (only for channels, playlists don't have this)
+        if not is_playlist and "banner_url" in show_metadata:
+            banner_show = "{}_{}".format(
+                show_metadata["refresh_date"], show_metadata["banner_url"]
+            )
+            if banner_show and banner_show not in metadata.banners:
+                metadata.banners[banner_show] = Proxy.Media(  # type: ignore # noqa: F821, E501
+                    read_url(
+                        Request(
+                            "{}{}".format(
+                                TA_CONFIG["ta_url"], show_metadata["banner_url"]
+                            ),
                         headers={
                             "Authorization": "Token {}".format(
                                 TA_CONFIG["ta_api_key"]
@@ -905,23 +974,23 @@ def Update(metadata, media, lang, force):  # noqa: C901
                     else 2
                 ),
             )
-            Log("[X] Banners: {}".format(banner_channel))  # type: ignore # noqa: F821, E501
-        elif banner_channel and banner_channel in metadata.banners:
-            Log("[_] Banners: {}".format(banner_channel))  # type: ignore # noqa: F821, E501
-        else:
-            Log("[ ] Banners: {}".format(banner_channel))  # type: ignore # noqa: F821, E501
+                Log("[X] Banners: {}".format(banner_show))  # type: ignore # noqa: F821, E501
+            elif banner_show and banner_show in metadata.banners:
+                Log("[_] Banners: {}".format(banner_show))  # type: ignore # noqa: F821, E501
+            else:
+                Log("[ ] Banners: {}".format(banner_show))  # type: ignore # noqa: F821, E501
 
         metadata.roles.clear()
         role = metadata.roles.new()
-        role.role = channel_title
-        role.name = channel_title
-        role.photo = thumb_channel
+        role.role = show_title
+        role.name = show_title
+        role.photo = thumb_show
 
-        metadata.summary = ch_metadata["description"]
+        metadata.summary = show_metadata["description"]
         metadata.studio = "YouTube"
 
         Log.Info(  # type: ignore # noqa: F821
-            "Channel metadata updates completed for {}.".format(channel_title)
+            "Show metadata updates completed for {}.".format(show_title)
         )
 
         episodes = 0

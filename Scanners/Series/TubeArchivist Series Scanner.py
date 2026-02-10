@@ -47,6 +47,7 @@ PLEX_LIBRARY_URL = "http://localhost:32400/library/sections/"
 SOURCE = "TubeArchivist Scanner"
 TA_CONFIG = None
 LOG_RETENTION = 5
+METADATA_CACHE = {}  # Cache for playlist and channel metadata during scan
 
 
 SSL_CONTEXT = ssl.SSLContext(SSL_PROTOCOL)
@@ -488,6 +489,9 @@ def get_ta_video_metadata(ytid):
             )
             metadata["ytid"] = vid_response["youtube_id"]
             metadata["title"] = vid_response["title"]
+            metadata["channel_id"] = vid_response["channel"]["channel_id"]
+            metadata["channel_name"] = vid_response["channel"]["channel_name"]
+            metadata["playlist"] = vid_response.get("playlist", [])
             if TA_CONFIG["version"] < [0, 3, 7]:
                 Log.debug(
                     "Processing response with initial TA API response format."
@@ -547,6 +551,13 @@ def get_ta_channel_metadata(chid):
     if not chid:
         Log.error("No {} ID present.".format(mtype))
         return None
+
+    # Check cache first
+    cache_key = "channel_{}".format(chid)
+    if cache_key in METADATA_CACHE:
+        Log.debug("Using cached metadata for channel: {}".format(chid))
+        return METADATA_CACHE[cache_key]
+
     try:
         ch_response = get_ta_metadata(chid, mtype=mtype)
         Log.info(
@@ -565,6 +576,9 @@ def get_ta_channel_metadata(chid):
                 ch_response["channel_name"],
                 ch_response["channel_id"],
             )
+            metadata["channel_id"] = ch_response["channel_id"]
+            metadata["channel_name"] = ch_response["channel_name"]
+            metadata["channel_subscribed"] = ch_response["channel_subscribed"]
             if TA_CONFIG["version"] < [0, 3, 7]:
                 Log.debug(
                     "Processing response with initial TA API response format."
@@ -585,6 +599,78 @@ def get_ta_channel_metadata(chid):
             metadata["banner_url"] = ch_response["channel_banner_url"]
             metadata["thumb_url"] = ch_response["channel_thumb_url"]
             metadata["tvart_url"] = ch_response["channel_tvart_url"]
+            # Cache the result
+            METADATA_CACHE[cache_key] = metadata
+            return metadata
+        else:
+            Log.error(
+                "Empty response returned from %s when requesting data about %s."  # noqa: E501
+                % (TA_CONFIG["ta_url"], mtype)
+            )
+    except Exception as e:
+        Log.error(
+            "Error processing %s response from TubeArchivist at location '%s', Exception: '%s'"  # noqa: E501
+            % (mtype, TA_CONFIG["ta_url"], e)
+        )
+        raise e
+
+
+def get_ta_playlist_metadata(plid):
+    mtype = "playlist"
+    if not TA_CONFIG:
+        Log.error("No configurations in TA_CONFIG.")
+        return None
+    if not plid:
+        Log.error("No {} ID present.".format(mtype))
+        return None
+
+    # Check cache first
+    cache_key = "playlist_{}".format(plid)
+    if cache_key in METADATA_CACHE:
+        Log.debug("Using cached metadata for playlist: {}".format(plid))
+        return METADATA_CACHE[cache_key]
+
+    try:
+        pl_response = get_ta_metadata(plid, mtype=mtype)
+        Log.info(
+            "Response from TubeArchivist received for YouTube {}: {}".format(
+                mtype, plid
+            )
+        )
+        if pl_response:
+            if TA_CONFIG["version"] < [0, 5, 0]:
+                Log.debug(
+                    "Processing response with pre-v0.5.0 TA API response format."  # noqa: E501
+                )
+                pl_response = pl_response["data"]
+            metadata = {}
+            metadata["show"] = "{} [{}]".format(
+                pl_response["playlist_name"],
+                pl_response["playlist_id"],
+            )
+            metadata["playlist_id"] = pl_response["playlist_id"]
+            metadata["playlist_name"] = pl_response["playlist_name"]
+            metadata["playlist_subscribed"] = pl_response["playlist_subscribed"]
+            if TA_CONFIG["version"] < [0, 3, 7]:
+                Log.debug(
+                    "Processing response with initial TA API response format."
+                )
+                playlist_refresh = datetime.datetime.strptime(
+                    pl_response["playlist_last_refresh"], "%d %b, %Y"
+                )
+            elif TA_CONFIG["version"] < [0, 5, 3]:
+                playlist_refresh = datetime.datetime.strptime(
+                    pl_response["playlist_last_refresh"], "%Y-%m-%d"
+                )
+            else:
+                playlist_refresh = set_date_to_utc(
+                    pl_response["playlist_last_refresh"]
+                )
+            metadata["refresh_date"] = playlist_refresh.strftime("%Y%m%d")
+            metadata["description"] = pl_response["playlist_description"]
+            metadata["thumb_url"] = pl_response["playlist_thumbnail"]
+            # Cache the result
+            METADATA_CACHE[cache_key] = metadata
             return metadata
         else:
             Log.error(
@@ -605,6 +691,12 @@ def Scan(path, files, mediaList, subdirs):  # noqa: C901
     TA_CONFIG["online"] = None
     TA_CONFIG["version"] = []
     TA_CONFIG["online"], TA_CONFIG["version"] = test_ta_connection()
+
+    # Clear metadata cache at start of each scan
+    global METADATA_CACHE
+    METADATA_CACHE = {}
+    Log.info("Metadata cache cleared for new scan")
+
     Log.info("Initiating scan of library files...")
     VideoFiles.Scan(path, files, mediaList, subdirs)
 
@@ -646,7 +738,73 @@ def Scan(path, files, mediaList, subdirs):  # noqa: C901
                                 ytid = file
                             try:
                                 video_metadata = get_ta_video_metadata(ytid)
-                                show = video_metadata["show"]
+
+                                # Determine which shows to create based on subscription status
+                                shows_to_create = []
+
+                                # Check for subscribed playlists first
+                                playlist_ids = video_metadata.get("playlist", [])
+                                for playlist_id in playlist_ids:
+                                    try:
+                                        pl_metadata = get_ta_playlist_metadata(playlist_id)  # noqa: E501
+                                        if pl_metadata and pl_metadata.get("playlist_subscribed"):  # noqa: E501
+                                            shows_to_create.append({
+                                                "type": "playlist",
+                                                "show": pl_metadata["show"],
+                                                "metadata": pl_metadata
+                                            })
+                                            Log.info(
+                                                "Video belongs to subscribed playlist: {}".format(  # noqa: E501
+                                                    pl_metadata["playlist_name"]
+                                                )
+                                            )
+                                    except Exception as e:
+                                        Log.error(
+                                            "Error fetching playlist metadata for {}: {}".format(  # noqa: E501
+                                                playlist_id, e
+                                            )
+                                        )
+
+                                # Also check if channel is subscribed (can appear in both playlist and channel)
+                                channel_id = video_metadata.get("channel_id")
+                                if channel_id:
+                                    try:
+                                        ch_metadata = get_ta_channel_metadata(channel_id)  # noqa: E501
+                                        if ch_metadata and ch_metadata.get("channel_subscribed"):  # noqa: E501
+                                            shows_to_create.append({
+                                                "type": "channel",
+                                                "show": video_metadata["show"],
+                                                "metadata": ch_metadata
+                                            })
+                                            Log.info(
+                                                "Video from subscribed channel: {}".format(  # noqa: E501
+                                                    video_metadata["channel_name"]
+                                                )
+                                            )
+                                        elif not shows_to_create:
+                                            # Only log skip if not in any subscribed playlists
+                                            Log.info(
+                                                "Video channel not subscribed, skipping: {}".format(  # noqa: E501
+                                                    video_metadata["channel_name"]
+                                                )
+                                            )
+                                    except Exception as e:
+                                        Log.error(
+                                            "Error fetching channel metadata for {}: {}".format(  # noqa: E501
+                                                channel_id, e
+                                            )
+                                        )
+
+                                # Skip video if no subscribed playlists or channels
+                                if not shows_to_create:
+                                    Log.info(
+                                        "Skipping video '{}' - no subscribed playlists or channels".format(  # noqa: E501
+                                            video_metadata["title"]
+                                        )
+                                    )
+                                    continue
+
+                                # Process common metadata
                                 if "video" in video_metadata["type"]:
                                     title = video_metadata["title"]
                                     season = video_metadata["season"]
@@ -656,7 +814,56 @@ def Scan(path, files, mediaList, subdirs):  # noqa: C901
                                         video_metadata["title"],
                                     )
                                     season = 0
-                                episode = video_metadata["episode"]
+                                episode_base = video_metadata["episode"]
+
+                                # Create Media.Episode for each show (playlist or channel)
+                                for show_info in shows_to_create:
+                                    show = show_info["show"]
+
+                                    # Track episode counts per show
+                                    if show not in episode_counts:
+                                        episode_counts[show] = {}
+                                    if season not in episode_counts[show]:
+                                        episode_counts[show][season] = {}
+                                    if episode_base not in episode_counts[show][season]:  # noqa: E501
+                                        episode_counts[show][season][episode_base] = 0
+                                    episode_counts[show][season][episode_base] += 1
+                                    episode = "{}{:02d}".format(
+                                        str(episode_base[2:]),
+                                        episode_counts[show][season][episode_base],
+                                    )
+
+                                    tv_show = Media.Episode(
+                                        str(show).encode("UTF-8"),
+                                        str(season).encode("UTF-8"),
+                                        episode,
+                                        str(title).encode("UTF-8"),
+                                        str(season).encode("UTF-8"),
+                                    )
+                                    Log.info(
+                                        "Identified episode '{} - {}' with TV Show {} ({}) under Season {}.".format(  # noqa: E501
+                                            episode, title, show, show_info["type"], season  # noqa: E501
+                                        )
+                                    )
+                                    episode_split = [
+                                        str(episode[x : x + 2])  # noqa: E203
+                                        for x in range(0, len(episode), 2)
+                                    ]
+                                    tv_show.released_at = str(
+                                        "{}-{}-{}".format(
+                                            episode_split[0],
+                                            episode_split[1],
+                                            episode_split[2],
+                                        )
+                                    ).encode("UTF-8")
+                                    tv_show.parts.append(i)
+                                    Log.info(
+                                        "Adding episode '{}' to TV show '{}' list of episodes.".format(  # noqa: E501
+                                            episode, show
+                                        )
+                                    )
+                                    mediaList.append(tv_show)
+
                             except Exception as e:
                                 Log.error(
                                     "Issue with fetching or setting metadata from video using response metadata: '%s', Exception: '%s'"  # noqa: E501
@@ -669,48 +876,6 @@ def Scan(path, files, mediaList, subdirs):  # noqa: C901
                             )
                             break
 
-                        if show not in episode_counts:
-                            episode_counts[show] = {}
-                        if season not in episode_counts[show]:
-                            episode_counts[show][season] = {}
-                        if episode not in episode_counts[show][season]:
-                            episode_counts[show][season][episode] = 0
-                        episode_counts[show][season][episode] += 1
-                        episode = "{}{:02d}".format(
-                            str(episode[2:]),
-                            episode_counts[show][season][episode],
-                        )
-
-                        tv_show = Media.Episode(
-                            str(show).encode("UTF-8"),
-                            str(season).encode("UTF-8"),
-                            episode,
-                            str(title).encode("UTF-8"),
-                            str(season).encode("UTF-8"),
-                        )
-                        Log.info(
-                            "Identified episode '{} - {}' with TV Show {} under Season {}.".format(  # noqa: E501
-                                episode, title, show, season
-                            )
-                        )
-                        episode_split = [
-                            str(episode[x : x + 2])  # noqa: E203
-                            for x in range(0, len(episode), 2)
-                        ]
-                        tv_show.released_at = str(
-                            "{}-{}-{}".format(
-                                episode_split[0],
-                                episode_split[1],
-                                episode_split[2],
-                            )
-                        ).encode("UTF-8")
-                        tv_show.parts.append(i)
-                        Log.info(
-                            "Adding episode '{}' to TV show '{}' list of episodes.".format(  # noqa: E501
-                                episode, show
-                            )
-                        )
-                        mediaList.append(tv_show)
                         break
 
     Stack.Scan(path, files, mediaList, subdirs)

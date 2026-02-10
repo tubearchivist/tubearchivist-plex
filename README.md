@@ -13,7 +13,7 @@ This pulls a lot of the metadata details directly from TubeArchivist, so TubeArc
 
 This is an early build, so there might be issues with detecting certain feature components. Issues with Feature Requests are recommended to document the request, however we may be unable to fulfill all requests without additional help and support. Pull Requests for features to add functionality or fix issues are welcome.
 
-Playlist integration is an expected roadmap item but is not currently available.
+**Playlist integration is now supported!** Videos can be organized by subscribed playlists in addition to channels. See the Playlist Support section below for details.
 
 Not all metadata that Plex can show is being provided at this time and will be incorporate with future releases.
 
@@ -84,6 +84,40 @@ A list of potential default installation locations:
     * TubeArchivist URL: The URL that Plex can access your TubeArchivist instance. Note: If using a non-standard port (HTTP uses 80, HTTPS uses 443), including the TubeArchivist default port of 8000, that must be included with the `TA_URL` configurations.
 6. The Scanner should immediately start finding new videos and update as it sees them, but you can also run a `Scan Library Files` for the Library to initiate a check.
 7. The Agent should update the metadata after finding the new videos, but you can also run a `Refresh Metadata` on the Library, Channel, or individual video to initiate an update.
+
+# Playlist Support
+
+The scanner now supports organizing videos by TubeArchivist playlists in addition to channels. This allows you to group related videos together regardless of which channel they're from.
+
+## How It Works
+
+The scanner uses a subscription-aware organization system:
+
+1. **Playlist Shows**: Videos that belong to **subscribed playlists** in TubeArchivist will appear under those playlist shows in Plex
+2. **Channel Shows**: Videos from **subscribed channels** in TubeArchivist will appear under their channel show
+3. **Duplicate Entries**: Videos can appear in multiple shows if they belong to multiple subscribed playlists and/or a subscribed channel
+4. **Filtering**: Videos are only shown if they belong to a subscribed playlist OR subscribed channel
+
+## Setup Requirements
+
+1. **Subscribe to playlists** in TubeArchivist that you want to see in Plex
+2. **Subscribe to channels** in TubeArchivist for videos not in playlists
+3. **Ensure playlists are refreshed** in TubeArchivist so video associations are up-to-date
+4. **Scan your Plex library** after subscribing to playlists
+
+## Organization Examples
+
+- Video in subscribed playlist "Best of 2024" → Appears under "Best of 2024" playlist show
+- Video in subscribed channel "Tech Channel" (no playlists) → Appears under "Tech Channel" channel show
+- Video in subscribed playlist + subscribed channel → Appears in BOTH the playlist show and channel show
+- Video in 2 subscribed playlists → Appears in both playlist shows
+- Video in 2 subscribed playlists + subscribed channel → Appears in all 3 shows
+- Video in non-subscribed playlist, non-subscribed channel → Not shown in Plex
+
+## Notes
+
+- Episode ordering within playlists uses upload date (YYYYMMDD format)
+- The scanner uses caching to minimize API calls during library scans
 
 # Troubleshooting
 If you are having problems with seeing the Scanner or Agent, confirm that the instructions are followed.
