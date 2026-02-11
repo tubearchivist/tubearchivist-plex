@@ -827,7 +827,7 @@ def Update(metadata, media, lang, force):  # noqa: C901
         thumb_channel = "{}_{}".format(
             ch_metadata["refresh_date"], ch_metadata["thumb_url"]
         )
-        if thumb_channel and thumb_channel not in metadata.posters:
+        if ch_metadata["thumb_url"] and thumb_channel not in metadata.posters:
             metadata.posters[thumb_channel] = Proxy.Media(  # type: ignore # noqa: F821, E501
                 read_url(
                     Request(
@@ -856,7 +856,7 @@ def Update(metadata, media, lang, force):  # noqa: C901
         tvart_channel = "{}_{}".format(
             ch_metadata["refresh_date"], ch_metadata["tvart_url"]
         )
-        if tvart_channel and tvart_channel not in metadata.art:
+        if ch_metadata["tvart_url"] and tvart_channel not in metadata.art:
             metadata.art[tvart_channel] = Proxy.Media(  # type: ignore # noqa: F821, E501
                 read_url(
                     Request(
@@ -885,7 +885,7 @@ def Update(metadata, media, lang, force):  # noqa: C901
         banner_channel = "{}_{}".format(
             ch_metadata["refresh_date"], ch_metadata["banner_url"]
         )
-        if banner_channel and banner_channel not in metadata.banners:
+        if ch_metadata["banner_url"] and banner_channel not in metadata.banners:
             metadata.banners[banner_channel] = Proxy.Media(  # type: ignore # noqa: F821, E501
                 read_url(
                     Request(
@@ -975,13 +975,12 @@ def Update(metadata, media, lang, force):  # noqa: C901
                         episode.originally_available_at = vid_metadata[
                             "processed_date"
                         ].date()
-
                         try:
                             thumb_vid = "{}_{}".format(
                                 vid_metadata["refresh_date"],
                                 vid_metadata["thumb_url"],
                             )
-                            if thumb_vid and thumb_vid not in episode.thumbs:
+                            if ch_metadata["thumb_url"] and thumb_vid not in episode.thumbs:
                                 episode.thumbs[thumb_vid] = Proxy.Media(  # type: ignore # noqa: F821, E501
                                     read_url(
                                         Request(
