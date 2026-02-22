@@ -46,7 +46,7 @@ A list of potential default installation locations:
     * '/raid0/data/PLEX_CONFIG/Plex Media Server/'                               # Thecus Plex community
 
 ## First time setup preparations
-1. Pull the [API Key](https://docs.tubearchivist.com/api/introduction/#authentication)) for TubeArchivist and have it ready for the configuration files.
+1. Pull the [API Key](https://docs.tubearchivist.com/api/introduction/#authentication) for TubeArchivist and have it ready for the configuration files.
 2. Ensure that Plex can see the TubeArchivist Media directory that you use to store the downloaded videos.
 3. Ensure that the system running Plex can communicate to TubeArchivist.
 4. If using a non-standard port (HTTP uses 80, HTTPS uses 443), including the TubeArchivist default port of 8000, that must be included with the `TA_URL` configurations.
